@@ -1,0 +1,13 @@
+
+{
+  "name": "TechSpeak Master",
+  "description": "Nền tảng học tiếng Anh chuyên dụng cho các ngành nghề kỹ thuật: Nail, Xây dựng, Thợ mộc... giúp bạn làm chủ giao tiếp tại nơi làm việc mà không cần trường lớp tốn kém.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ],
+  "permissions": {
+    "microphone": "Chúng tôi cần quyền truy cập microphone để bạn có thể luyện tập phát âm và hội thoại với AI.",
+    "camera": "Quyền truy cập camera có thể được sử dụng để quét tài liệu hoặc thực hành tình huống video trong tương lai."
+  }
+}
