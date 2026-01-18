@@ -147,15 +147,9 @@ const NailSpeakScore: React.FC<NailSpeakScoreProps> = ({ targetText, onScoreUpda
   };
 
   return (
-    <div className="bg-white flex flex-col items-center w-full max-w-sm mx-auto p-2">
-      <div className="flex justify-center mb-6">
-        <span className="bg-indigo-600 text-white px-4 py-2 rounded-full text-[11px] font-black tracking-widest uppercase shadow-sm">
-          TECHSPEAK ASSESSMENT
-        </span>
-      </div>
-
-      <div className="w-full flex items-center gap-3 mb-8 px-1">
-        <div className="flex-1 bg-slate-50/80 rounded-[32px] p-6 border border-slate-100 shadow-sm min-h-[110px] flex items-center justify-center">
+    <div className="bg-white flex flex-col items-center w-full max-w-sm mx-auto">
+      <div className="w-full flex items-center gap-3 mb-6 px-1">
+        <div className="flex-1 bg-slate-50/80 rounded-[32px] p-6 border border-slate-100 shadow-sm min-h-[100px] flex items-center justify-center">
           <h3 className="text-xl font-bold text-center text-slate-800 leading-tight">
             "{targetText}"
           </h3>
@@ -168,32 +162,32 @@ const NailSpeakScore: React.FC<NailSpeakScoreProps> = ({ targetText, onScoreUpda
         </button>
       </div>
 
-      <div className="relative mb-10">
+      <div className="relative mb-8">
         {analyzing ? (
-          <div className="w-44 h-44 rounded-full border-[12px] border-slate-100 flex flex-col items-center justify-center animate-pulse">
-            <Loader2 className="animate-spin text-indigo-500 mb-2" size={40} />
-            <span className="text-[11px] text-slate-400 font-black uppercase tracking-widest">Phân tích...</span>
+          <div className="w-40 h-40 rounded-full border-[10px] border-slate-100 flex flex-col items-center justify-center animate-pulse">
+            <Loader2 className="animate-spin text-indigo-500 mb-2" size={32} />
+            <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Phân tích...</span>
           </div>
         ) : result ? (
-          <div className={`w-44 h-44 rounded-full border-[14px] flex flex-col items-center justify-center bg-white ${getCircleColor(result.score)} transition-all duration-700 shadow-2xl shadow-slate-100`}>
+          <div className={`w-40 h-40 rounded-full border-[12px] flex flex-col items-center justify-center bg-white ${getCircleColor(result.score)} transition-all duration-700 shadow-2xl shadow-slate-100`}>
             <span className={`text-6xl font-black ${result.score >= 75 ? 'text-green-500' : 'text-indigo-600'}`}>
               {result.score}
             </span>
-            <span className="text-[11px] uppercase font-black tracking-widest text-slate-400">Points</span>
+            <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Points</span>
           </div>
         ) : (
-          <div className="w-44 h-44 rounded-full border-[10px] border-dashed border-slate-200 flex items-center justify-center bg-slate-50/50">
+          <div className="w-40 h-40 rounded-full border-[10px] border-dashed border-slate-200 flex items-center justify-center bg-slate-50/50">
             <div className="flex flex-col items-center gap-2">
-               <Mic size={32} className="text-slate-300" />
-               <span className="text-slate-400 text-[11px] font-black text-center px-8 uppercase tracking-widest">Luyện đọc</span>
+               <Mic size={28} className="text-slate-300" />
+               <span className="text-slate-400 text-[10px] font-black text-center px-8 uppercase tracking-widest">Bắt đầu nói</span>
             </div>
           </div>
         )}
       </div>
 
       {result && (
-        <div className="animate-fade-in w-full bg-indigo-50/40 border border-indigo-100 p-6 rounded-[32px] mb-8 shadow-sm">
-          <p className="font-black text-indigo-900 mb-2 text-center text-base">
+        <div className="animate-fade-in w-full bg-indigo-50/40 border border-indigo-100 p-5 rounded-[28px] mb-6 shadow-sm">
+          <p className="font-black text-indigo-900 mb-1 text-center text-base">
             {result.score >= 85 ? "Rất xuất sắc! 🥳" : result.score >= 70 ? "Khá tốt! ✨" : "Cố gắng thêm nhé! 💪"}
           </p>
           <p className="text-xs text-indigo-600/80 italic text-center leading-relaxed font-semibold">
@@ -202,42 +196,42 @@ const NailSpeakScore: React.FC<NailSpeakScoreProps> = ({ targetText, onScoreUpda
         </div>
       )}
 
-      <div className="flex items-center justify-center gap-6 w-full mb-8">
+      <div className="flex items-center justify-center gap-6 w-full mb-6">
         <button
           onClick={playUserRecording}
           disabled={!userAudioUrl || isRecording}
-          className={`w-16 h-16 flex items-center justify-center rounded-full transition-all active:scale-95 border
+          className={`w-14 h-14 flex items-center justify-center rounded-full transition-all active:scale-95 border
             ${userAudioUrl && !isRecording 
               ? 'bg-slate-50 text-slate-600 border-slate-200 shadow-md' 
               : 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed'}`}
         >
-          <Play size={32} fill={userAudioUrl && !isRecording ? "currentColor" : "none"} />
+          <Play size={28} fill={userAudioUrl && !isRecording ? "currentColor" : "none"} />
         </button>
 
         {!isRecording ? (
           <button
             onClick={startRecording}
             disabled={analyzing}
-            className="flex-1 max-w-[220px] h-16 flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[28px] font-black text-lg shadow-2xl shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50"
+            className="flex-1 max-w-[200px] h-14 flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black text-base shadow-2xl shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50"
           >
-            {result ? <RefreshCw size={26} /> : <Mic size={26} />}
+            {result ? <RefreshCw size={22} /> : <Mic size={22} />}
             <span>{result ? 'Thử lại' : 'Ghi âm'}</span>
           </button>
         ) : (
           <button
             onClick={stopRecording}
-            className="flex-1 max-w-[220px] h-16 flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 text-white rounded-[28px] font-black text-lg shadow-2xl shadow-red-100 animate-pulse active:scale-95"
+            className="flex-1 max-w-[200px] h-14 flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 text-white rounded-[24px] font-black text-base shadow-2xl shadow-red-100 animate-pulse active:scale-95"
           >
-            <Square size={24} fill="currentColor" />
+            <Square size={20} fill="currentColor" />
             <span>Dừng</span>
           </button>
         )}
       </div>
 
-      <div className="pt-6 border-t border-slate-100 w-full flex justify-center items-center gap-3">
-        <Award size={20} className="text-amber-500" />
-        <span className="text-[12px] text-slate-400 font-black uppercase tracking-widest">Kỷ lục:</span>
-        <span className="text-base font-black text-slate-800">{bestScore > 0 ? `${bestScore}đ` : '--'}</span>
+      <div className="pt-5 border-t border-slate-100 w-full flex justify-center items-center gap-3">
+        <Award size={18} className="text-amber-500" />
+        <span className="text-[11px] text-slate-400 font-black uppercase tracking-widest">Kỷ lục:</span>
+        <span className="text-sm font-black text-slate-800">{bestScore > 0 ? `${bestScore}đ` : '--'}</span>
       </div>
     </div>
   );
