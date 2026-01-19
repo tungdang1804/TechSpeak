@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Chat } from '@google/genai';
 import { createRoleplaySession, sendRoleplayMessage, RoleplayTurnResponse } from '../services/geminiService';
 import { blobToBase64, playAudio } from '../utils/audioUtils';
-import { Mic, Square, Bot, User, RefreshCw, Send, Loader2, Sparkles, Volume2, Award, ScrollText } from 'lucide-react';
+import { Mic, Square, Bot, User, RefreshCw, Sparkles, Volume2, Award, ScrollText, Heart, Loader2 } from 'lucide-react';
 
 declare var Capacitor: any;
 
@@ -19,6 +19,7 @@ interface Message {
   score?: number;
   feedback?: string;
   transcript?: string;
+  satisfaction?: number;
 }
 
 const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }) => {
@@ -27,6 +28,7 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
   const [isRecording, setIsRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [currentSatisfaction, setCurrentSatisfaction] = useState(70);
   
   const mediaRecorderRef = useRef<any>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -55,19 +57,15 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
   };
 
   const startRecording = async () => {
-    // Native Recording
     if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()) {
       try {
         const { VoiceRecorder } = await import('https://cdn.jsdelivr.net/npm/@capacitor-community/voice-recorder/+esm' as any);
         await VoiceRecorder.startRecording();
         setIsRecording(true);
         return;
-      } catch (e) {
-        console.error("Native start failed", e);
-      }
+      } catch (e) {}
     }
 
-    // Web Fallback
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
@@ -85,8 +83,7 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error("Mic Error:", error);
-      alert("Please allow microphone access in your system settings.");
+      alert("Vui lòng cấp quyền microphone.");
     }
   };
 
@@ -104,9 +101,7 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
         const response = await sendRoleplayMessage(session!, result.value.recordDataBase64, null, result.value.mimeType);
         updateMessagesWithResponse(tempId, response);
         return;
-      } catch (e) {
-        console.error("Native stop failed", e);
-      }
+      } catch (e) {}
     }
 
     if (mediaRecorderRef.current && isRecording) {
@@ -124,11 +119,15 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
         text: '',
         transcript: response.user_transcript || "(Audio)",
         score: response.score,
-        feedback: response.feedback
+        feedback: response.feedback,
+        satisfaction: response.satisfaction
       };
       const aiMsg: Message = { id: (Date.now() + 1).toString(), sender: 'ai', text: response.ai_response };
       return [...filtered, userMsg, aiMsg];
     });
+    if (response.satisfaction !== undefined) {
+      setCurrentSatisfaction(response.satisfaction);
+    }
     setProcessing(false);
     playAudio(response.ai_response);
   };
@@ -143,40 +142,29 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
     updateMessagesWithResponse(tempId, response);
   };
 
-  const getScoreColor = (score?: number) => {
-    if (score === undefined) return 'bg-gray-100';
-    if (score >= 80) return 'bg-green-100 text-green-700 border-green-200';
-    if (score >= 50) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-    return 'bg-red-100 text-red-700 border-red-200';
+  const getSatisfactionEmoji = (val: number) => {
+    if (val >= 80) return '😍';
+    if (val >= 60) return '😊';
+    if (val >= 40) return '😐';
+    return '😡';
   };
 
   if (!initialized) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-fade-in bg-white">
-        <div className="w-28 h-28 bg-indigo-50 rounded-[40px] flex items-center justify-center mb-8 text-indigo-600 shadow-xl shadow-indigo-50/50">
-          <Bot size={56} />
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-white">
+        <div className="w-24 h-24 bg-indigo-50 rounded-[32px] flex items-center justify-center mb-6 text-indigo-600 shadow-lg">
+          <Bot size={48} />
         </div>
-        <h2 className="text-2xl font-black text-slate-800 mb-3">Thực Chiến AI</h2>
-        <p className="text-slate-500 mb-8 font-medium">
-          Luyện nói tự nhiên với khách hàng ảo. Nhận phản hồi ngay lập tức về phát âm và độ lưu loát.
-        </p>
-
-        <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 mb-10 text-left w-full max-w-sm shadow-sm">
-          <h3 className="font-black text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-widest">
-             <ScrollText size={18} className="text-indigo-500"/> Nhiệm vụ của bạn:
+        <h2 className="text-xl font-black text-slate-800 mb-2">Thực Chiến AI</h2>
+        <p className="text-slate-500 mb-6 text-sm">Luyện giao tiếp thực tế và đo lường mức độ hài lòng của khách.</p>
+        <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-8 text-left w-full max-w-sm">
+          <h3 className="font-black text-slate-800 mb-2 text-[10px] uppercase tracking-widest flex items-center gap-2">
+             <ScrollText size={14} className="text-indigo-500"/> Nhiệm vụ
           </h3>
-          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">
-            {userScenario}
-          </p>
+          <p className="text-xs text-slate-600 leading-relaxed font-medium">{userScenario}</p>
         </div>
-
-        <button
-          onClick={startConversation}
-          disabled={!session}
-          className="flex items-center justify-center gap-3 w-full max-w-[280px] py-5 bg-indigo-600 text-white rounded-[24px] font-black text-lg shadow-2xl shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50"
-        >
-          <Sparkles size={22} />
-          Bắt đầu ngay
+        <button onClick={startConversation} className="flex items-center justify-center gap-2 w-full max-w-[240px] py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-xl">
+          <Sparkles size={18} /> Bắt đầu
         </button>
       </div>
     );
@@ -184,90 +172,77 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
 
   return (
     <div className="flex flex-col h-full bg-slate-50 relative">
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-40 custom-scrollbar">
+      {/* Satisfaction Bar */}
+      <div className="bg-white border-b border-slate-100 p-3 flex items-center gap-4 z-20">
+        <div className="text-lg">{getSatisfactionEmoji(currentSatisfaction)}</div>
+        <div className="flex-1 flex flex-col gap-1">
+          <div className="flex justify-between items-center">
+             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Khách hàng hài lòng</span>
+             <span className="text-[10px] font-black text-indigo-600">{currentSatisfaction}%</span>
+          </div>
+          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div 
+              className={`h-full transition-all duration-500 rounded-full ${currentSatisfaction >= 60 ? 'bg-green-500' : currentSatisfaction >= 40 ? 'bg-amber-400' : 'bg-red-500'}`}
+              style={{ width: `${currentSatisfaction}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-40 no-scrollbar">
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`flex flex-col max-w-[85%] ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
               <div className={`flex gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm mt-1
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm mt-1
                   ${msg.sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-600 border border-indigo-50'}`}>
-                  {msg.sender === 'user' ? <User size={20} /> : <Bot size={20} />}
+                  {msg.sender === 'user' ? <User size={18} /> : <Bot size={18} />}
                 </div>
-                <div className={`p-5 rounded-[24px] text-sm shadow-sm border
-                  ${msg.sender === 'user' 
-                    ? 'bg-white border-indigo-50 rounded-tr-none text-right' 
-                    : 'bg-white border-indigo-50 rounded-tl-none text-left'}`}>
+                <div className={`p-4 rounded-[20px] text-sm shadow-sm border bg-white border-indigo-50
+                  ${msg.sender === 'user' ? 'rounded-tr-none text-right' : 'rounded-tl-none text-left'}`}>
                   {msg.sender === 'ai' ? (
-                    <div className="flex flex-col gap-3">
-                      <p className="text-slate-800 leading-relaxed text-base font-medium">{msg.text}</p>
-                      <button onClick={() => playAudio(msg.text)} className="self-start p-2 bg-indigo-50 text-indigo-500 rounded-xl active:scale-90 transition-all">
-                        <Volume2 size={18} />
-                      </button>
+                    <div className="flex flex-col gap-2">
+                      <p className="text-slate-800 font-medium">{msg.text}</p>
+                      <button onClick={() => playAudio(msg.text)} className="self-start p-1.5 bg-indigo-50 text-indigo-500 rounded-lg"><Volume2 size={16} /></button>
                     </div>
                   ) : (
-                    <p className="text-slate-800 font-bold text-base leading-snug italic">"{msg.transcript || '...'}"</p>
+                    <p className="text-slate-800 font-bold italic">"{msg.transcript || '...'}"</p>
                   )}
                 </div>
               </div>
               {msg.sender === 'user' && msg.score !== undefined && (
-                <div className="mt-3 mr-12 animate-fade-in-up">
-                   <div className={`inline-flex flex-col p-4 rounded-[24px] border ${getScoreColor(msg.score)} max-w-xs text-left shadow-sm`}>
-                      <div className="flex items-center gap-2 mb-2 border-b border-black/5 pb-2">
-                         <Award size={16} />
-                         <span className="font-black uppercase text-[10px] tracking-widest">Feedback: {msg.score}/100</span>
-                      </div>
-                      <p className="text-[11px] font-bold leading-relaxed opacity-90">{msg.feedback}</p>
+                <div className="mt-2 mr-10 p-3 bg-white border border-slate-100 rounded-xl shadow-sm text-left max-w-[200px]">
+                   <div className="flex items-center gap-1.5 mb-1 text-amber-500 border-b border-slate-50 pb-1">
+                      <Award size={12} />
+                      <span className="font-black uppercase text-[8px] tracking-widest">Score: {msg.score}</span>
                    </div>
+                   <p className="text-[10px] font-bold text-slate-500">{msg.feedback}</p>
                 </div>
               )}
             </div>
           </div>
         ))}
         {processing && (
-           <div className="flex justify-start animate-fade-in">
-              <div className="flex items-center gap-3 bg-white border border-slate-100 px-5 py-4 rounded-[24px] rounded-tl-none shadow-sm ml-12">
-                 <Loader2 size={20} className="animate-spin text-indigo-500" />
-                 <span className="text-sm text-slate-400 font-bold tracking-tight">AI đang lắng nghe...</span>
+           <div className="flex justify-start ml-12">
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-slate-100 shadow-sm">
+                 <Loader2 size={14} className="animate-spin text-indigo-500" />
+                 <span className="text-[10px] text-slate-400 font-black">AI IS THINKING...</span>
               </div>
            </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full bg-white border-t border-slate-100 p-6 pb-10 z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">
+      <div className="absolute bottom-0 left-0 w-full bg-white border-t border-slate-100 p-6 pb-10 z-30 shadow-lg">
         <div className="flex items-center justify-center gap-8">
-          <button 
-            onClick={() => { setInitialized(false); setMessages([]); }}
-            className="w-14 h-14 flex items-center justify-center text-slate-400 bg-slate-50 rounded-full hover:bg-slate-100 transition-all active:scale-90"
-          >
-            <RefreshCw size={24} />
-          </button>
-
+          <button onClick={() => { setInitialized(false); setMessages([]); }} className="w-12 h-12 flex items-center justify-center text-slate-400 bg-slate-50 rounded-full"><RefreshCw size={20} /></button>
           {!isRecording ? (
-             <button
-               onClick={startRecording}
-               disabled={processing}
-               className={`flex items-center justify-center w-20 h-20 rounded-[32px] shadow-2xl transition-all active:scale-95
-                 ${processing 
-                    ? 'bg-slate-100 text-slate-300' 
-                    : 'bg-indigo-600 text-white shadow-indigo-100'}`}
-             >
-               <Mic size={36} />
-             </button>
+             <button onClick={startRecording} disabled={processing} className={`w-16 h-16 rounded-[24px] shadow-xl flex items-center justify-center ${processing ? 'bg-slate-100 text-slate-300' : 'bg-indigo-600 text-white shadow-indigo-100'}`}><Mic size={28} /></button>
           ) : (
-             <button
-               onClick={stopRecording}
-               className="flex items-center justify-center w-20 h-20 bg-red-500 text-white rounded-[32px] shadow-2xl shadow-red-100 animate-pulse active:scale-95"
-             >
-               <Square size={32} fill="currentColor" />
-             </button>
+             <button onClick={stopRecording} className="w-16 h-16 bg-red-500 text-white rounded-[24px] shadow-xl flex items-center justify-center animate-pulse"><Square size={24} fill="currentColor" /></button>
           )}
-
-          <div className="w-14 h-14"></div>
+          <div className="w-12 h-12"></div>
         </div>
-        <p className="text-center text-[10px] text-slate-400 mt-4 font-black uppercase tracking-[0.2em]">
-           {isRecording ? "ĐANG GHI ÂM" : processing ? "ĐANG XỬ LÝ" : "NHẤN ĐỂ TRẢ LỜI"}
-        </p>
       </div>
     </div>
   );

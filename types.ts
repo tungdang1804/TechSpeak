@@ -29,6 +29,13 @@ export interface ScriptLine {
   variations?: ScriptVariation[];
 }
 
+export interface LessonStep {
+  id: string;
+  title: string;
+  purpose: string;
+  lines: ScriptLine[];
+}
+
 export interface GrammarPoint {
   id: string;
   title: string;
@@ -44,28 +51,20 @@ export interface Lesson {
   thumbnail: string;
   order: number;
   
-  // New Context Information
+  // Context Information
   contextBackground: string;
   contextGoal: string;
   contextCharacters: { name: string; role: string }[];
 
-  // Situation
-  situationTitle: string;
-  situationScript: ScriptLine[];
+  // Structured Content
+  steps: LessonStep[];
 
-  // Vocabulary
+  // Vocabulary & Grammar
   vocabularies: Vocabulary[];
-
-  // Grammar
   grammarPoints: GrammarPoint[];
   
   roleplayPrompt: string;
   roleplayScenario: string;
-  
-  homeworkVocab?: Vocabulary[];
-  customerInputGroups?: any[];
-  techOutputGroups?: any[];
-  dialogue?: any[];
 }
 
 export interface UserProgress {
@@ -80,4 +79,21 @@ export interface IPASound {
   name?: string;
   description: string;
   examples: { word: string; meaning: string; ipa: string }[];
+}
+
+// Star Detective Types
+export type GameCategory = 'Shape' | 'Length' | 'Color' | 'Style' | 'Deco';
+
+export interface GameChoice {
+  id: string;
+  label: string;
+  category: GameCategory;
+  icon?: string;
+}
+
+export interface GameRound {
+  id: string;
+  audioText: string;
+  correctIds: string[];
+  choices: GameChoice[];
 }
