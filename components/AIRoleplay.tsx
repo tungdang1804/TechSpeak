@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Chat } from '@google/genai';
-import { createRoleplaySession, sendRoleplayMessage, RoleplayTurnResponse } from '../services/geminiService';
+import { createRoleplaySession, sendRoleplayMessage, RoleplayTurnResponse, analyzeConversationHistory, RoleplaySummary } from '../services/geminiService';
 import { blobToBase64, playAudio } from '../utils/audioUtils';
-import { Mic, Square, Bot, User, RefreshCw, Sparkles, Volume2, Award, ScrollText, Heart, Loader2 } from 'lucide-react';
+import { Mic, Square, Bot, User, RefreshCw, Sparkles, Volume2, Award, ScrollText, Heart, Loader2, ClipboardCheck, ThumbsUp, Target, TrendingUp } from 'lucide-react';
 
 declare var Capacitor: any;
 
@@ -29,6 +29,8 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
   const [processing, setProcessing] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [currentSatisfaction, setCurrentSatisfaction] = useState(70);
+  const [summary, setSummary] = useState<RoleplaySummary | null>(null);
+  const [isFinishing, setIsFinishing] = useState(false);
   
   const mediaRecorderRef = useRef<any>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -39,6 +41,8 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
     setSession(newSession);
     setMessages([]);
     setInitialized(false);
+    setSummary(null);
+    setIsFinishing(false);
   }, [scenarioContext]);
 
   useEffect(() => {
@@ -110,7 +114,8 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
     }
   };
 
-  const updateMessagesWithResponse = (tempId: string, response: RoleplayTurnResponse) => {
+  const updateMessagesWithResponse = async (tempId: string, response: RoleplayTurnResponse) => {
+    const aiMsgId = (Date.now() + 1).toString();
     setMessages(prev => {
       const filtered = prev.filter(m => m.id !== tempId);
       const userMsg: Message = {
@@ -122,12 +127,32 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
         feedback: response.feedback,
         satisfaction: response.satisfaction
       };
-      const aiMsg: Message = { id: (Date.now() + 1).toString(), sender: 'ai', text: response.ai_response };
+      const aiMsg: Message = { id: aiMsgId, sender: 'ai', text: response.ai_response };
       return [...filtered, userMsg, aiMsg];
     });
+
     if (response.satisfaction !== undefined) {
       setCurrentSatisfaction(response.satisfaction);
     }
+
+    if (response.is_finished) {
+      setIsFinishing(true);
+      // Wait a bit for the last AI response to be read or seen
+      setTimeout(async () => {
+        const history = messages.map(m => ({
+          role: m.sender === 'user' ? 'Technician' : 'Customer',
+          text: m.sender === 'user' ? m.transcript || '' : m.text
+        }));
+        // Add current turn to history for analysis
+        history.push({ role: 'Technician', text: response.user_transcript });
+        history.push({ role: 'Customer', text: response.ai_response });
+        
+        const report = await analyzeConversationHistory(history);
+        setSummary(report);
+        setIsFinishing(false);
+      }, 1500);
+    }
+
     setProcessing(false);
     playAudio(response.ai_response);
   };
@@ -148,6 +173,86 @@ const AIRoleplay: React.FC<AIRoleplayProps> = ({ scenarioContext, userScenario }
     if (val >= 40) return '😐';
     return '😡';
   };
+
+  if (summary) {
+    return (
+      <div className="h-full flex flex-col bg-app-bg overflow-y-auto no-scrollbar p-6 animate-fade-in">
+        <div className="flex flex-col items-center mb-8">
+           <div className="w-20 h-20 bg-green-500 text-white rounded-[32px] flex items-center justify-center mb-4 shadow-xl shadow-green-100">
+             <ClipboardCheck size={40} />
+           </div>
+           <h2 className="text-2xl font-black text-app-text">Tổng Kết Phiên Tập</h2>
+           <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">Star Spa Performance Report</p>
+        </div>
+
+        {/* Professional Rating */}
+        <div className="bg-white rounded-5xl p-8 soft-shadow mb-6 border border-white/50 relative overflow-hidden">
+           <div className="absolute top-0 left-0 w-full h-1.5 bg-green-500"></div>
+           <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Chỉ số chuyên nghiệp</p>
+           <div className="flex items-baseline gap-2">
+             <span className="text-6xl font-black text-app-text">{summary.professional_rating}</span>
+             <span className="text-xl font-bold text-slate-300">/100</span>
+           </div>
+           <p className="text-sm font-bold text-slate-500 mt-4 leading-relaxed italic">"{summary.overall_evaluation}"</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 mb-6">
+           {/* Strengths */}
+           <div className="bg-white rounded-4xl p-6 soft-shadow border border-white/50">
+             <h3 className="flex items-center gap-2 text-xs font-black text-green-600 uppercase tracking-widest mb-4">
+               <ThumbsUp size={16} /> Điểm sáng của bạn
+             </h3>
+             <ul className="space-y-3">
+               {summary.strengths.map((s, i) => (
+                 <li key={i} className="flex gap-3 text-sm font-bold text-slate-600">
+                   <div className="w-5 h-5 bg-green-50 rounded-full flex items-center justify-center shrink-0 text-green-500">✓</div>
+                   {s}
+                 </li>
+               ))}
+             </ul>
+           </div>
+
+           {/* 3 Improvement Areas */}
+           <div className="bg-app-text text-white rounded-4xl p-6 soft-shadow">
+             <h3 className="flex items-center gap-2 text-xs font-black text-app-accent uppercase tracking-widest mb-4">
+               <TrendingUp size={16} /> 3 Điểm cần lưu ý
+             </h3>
+             <div className="space-y-4">
+               {summary.improvements.slice(0, 3).map((imp, i) => (
+                 <div key={i} className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                   <p className="text-app-accent font-black text-sm mb-1">{imp.word}</p>
+                   <p className="text-[11px] text-white/60 font-medium leading-relaxed">{imp.reason}</p>
+                 </div>
+               ))}
+             </div>
+           </div>
+        </div>
+
+        <button 
+          onClick={() => { setSummary(null); setInitialized(false); setMessages([]); }}
+          className="w-full py-4 bg-app-primary text-white rounded-2xl font-black shadow-xl active:scale-95 transition-all uppercase tracking-widest text-xs mb-10"
+        >
+          Tập luyện lại
+        </button>
+      </div>
+    );
+  }
+
+  if (isFinishing) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center p-10 bg-white">
+        <div className="relative mb-8">
+           <Loader2 size={60} className="text-app-primary animate-spin" />
+           <div className="absolute inset-0 flex items-center justify-center">
+             <Sparkles size={24} className="text-app-accent animate-pulse" />
+           </div>
+        </div>
+        <p className="text-sm font-black text-slate-400 uppercase tracking-widest text-center animate-pulse">
+          Đang phân tích kỹ thuật của bạn...
+        </p>
+      </div>
+    );
+  }
 
   if (!initialized) {
     return (

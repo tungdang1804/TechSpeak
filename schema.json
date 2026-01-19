@@ -1,0 +1,160 @@
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TechSpeak Lesson Schema",
+  "description": "Cấu trúc dữ liệu chuẩn cho một bài học tiếng Anh chuyên ngành trên nền tảng TechSpeak.",
+  "type": "object",
+  "required": [
+    "id",
+    "order",
+    "title",
+    "description",
+    "context",
+    "steps",
+    "vocabularies",
+    "grammar_points",
+    "roleplay"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Mã định danh duy nhất của bài học (ví dụ: lesson_1)."
+    },
+    "order": {
+      "type": "integer",
+      "description": "Thứ tự của bài học trong lộ trình."
+    },
+    "title": {
+      "type": "string",
+      "description": "Tiêu đề chính của bài học."
+    },
+    "description": {
+      "type": "string",
+      "description": "Mô tả ngắn gọn về nội dung bài học."
+    },
+    "thumbnail": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL hình ảnh đại diện cho bài học."
+    },
+    "context": {
+      "type": "object",
+      "description": "Bối cảnh và mục tiêu của bài học.",
+      "required": ["background", "goal", "characters"],
+      "properties": {
+        "background": { "type": "string" },
+        "goal": { "type": "string" },
+        "characters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "role": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "description": "Danh sách các bước (tình huống) trong bài học.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "purpose", "lines"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "purpose": { "type": "string" },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "speaker", "text", "translation"],
+              "properties": {
+                "id": { "type": "string" },
+                "speaker": {
+                  "type": "string",
+                  "enum": ["Tech", "Customer", "Student"]
+                },
+                "text": { "type": "string" },
+                "translation": { "type": "string" },
+                "variations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "text": { "type": "string" },
+                      "translation": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vocabularies": {
+      "type": "array",
+      "description": "Kho từ vựng trọng tâm của bài học.",
+      "items": {
+        "type": "object",
+        "required": ["id", "word", "translation", "ipa"],
+        "properties": {
+          "id": { "type": "string" },
+          "word": { "type": "string" },
+          "translation": { "type": "string" },
+          "ipa": { "type": "string" },
+          "definition": { "type": "string" },
+          "imageUrl": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "grammar_points": {
+      "type": "array",
+      "description": "Các điểm ngữ pháp ứng dụng.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description", "examples"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "structure": { "type": "string" },
+          "examples": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "english": { "type": "string" },
+                "vietnamese": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "roleplay": {
+      "type": "object",
+      "description": "Cấu hình cho kịch bản hội thoại với AI.",
+      "required": ["ai_instructions", "user_instructions"],
+      "properties": {
+        "ai_instructions": {
+          "type": "string",
+          "description": "Chỉ dẫn chi tiết cho AI về vai diễn và hành vi (roleplayPrompt)."
+        },
+        "user_instructions": {
+          "type": "string",
+          "description": "Nhiệm vụ dành cho người dùng trong tình huống (roleplayScenario)."
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Trường dữ liệu mở rộng cho tương lai (tags, difficulty, v.v.)",
+      "additionalProperties": true
+    }
+  }
+}

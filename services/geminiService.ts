@@ -12,6 +12,13 @@ export interface RoleplayTurnResponse {
   is_finished: boolean;
 }
 
+export interface RoleplaySummary {
+  overall_evaluation: string;
+  strengths: string[];
+  improvements: { word: string; reason: string }[];
+  professional_rating: number;
+}
+
 // Helper to create AI client using process.env.API_KEY directly
 const createAIClient = () => {
   return new GoogleGenAI({ apiKey: process.env.API_KEY as string });
@@ -110,7 +117,7 @@ export const assessPronunciation = async (audioBase64: string, targetText: strin
 
 export const createRoleplaySession = (context: string) => {
   const ai = createAIClient();
-  const systemInstruction = `You are a character in a Technical Workplace setting. Context: ${context}. Interaction Rules: 1. Communicate naturally. 2. Evaluate user's technical accuracy, politeness, and clarity. 3. Include a "satisfaction" score (0-100). 4. Feedback must be in Vietnamese. 5. Occasionally introduce "random variables" to test flexibility.`;
+  const systemInstruction = `You are a character in a Technical Workplace setting. Context: ${context}. Interaction Rules: 1. Communicate naturally. 2. Evaluate user's technical accuracy, politeness, and clarity. 3. Include a "satisfaction" score (0-100). 4. Feedback must be in Vietnamese. 5. Occasionally introduce "random variables" to test flexibility. If the session goal is met, set is_finished to true.`;
   return ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
@@ -138,5 +145,69 @@ export const sendRoleplayMessage = async (chat: Chat, audioBase64: string | null
   } catch (error) {
     console.error("Roleplay API Error:", error);
     return { ai_response: "Lỗi kết nối.", user_transcript: "", score: 0, feedback: "Lỗi AI.", satisfaction: 50, is_finished: false };
+  }
+};
+
+export const analyzeConversationHistory = async (history: { role: string; text: string }[]): Promise<RoleplaySummary> => {
+  const ai = createAIClient();
+  const conversationText = history.map(h => `${h.role}: ${h.text}`).join('\n');
+  
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `
+        Analyze this Technical English Roleplay session for a Nail Salon staff.
+        Conversation history:
+        ${conversationText}
+
+        Evaluation Rules:
+        1. Evaluate based on Professionalism, Politeness, and Technical Accuracy.
+        2. Identify 3 specific English words or phrases the user struggled with or could improve.
+        3. All feedback must be in Vietnamese.
+
+        Return JSON in this format:
+        {
+          "overall_evaluation": "Summary of the whole session",
+          "strengths": ["list", "of", "strengths"],
+          "improvements": [
+            {"word": "word or phrase", "reason": "why they need to improve it"}
+          ],
+          "professional_rating": 0-100
+        }
+      `,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            overall_evaluation: { type: Type.STRING },
+            strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+            improvements: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  word: { type: Type.STRING },
+                  reason: { type: Type.STRING }
+                },
+                required: ["word", "reason"]
+              }
+            },
+            professional_rating: { type: Type.INTEGER }
+          },
+          required: ["overall_evaluation", "strengths", "improvements", "professional_rating"]
+        }
+      }
+    });
+
+    return JSON.parse(response.text || '{}') as RoleplaySummary;
+  } catch (error) {
+    console.error("Analysis Error:", error);
+    return {
+      overall_evaluation: "Không thể phân tích dữ liệu lúc này.",
+      strengths: [],
+      improvements: [],
+      professional_rating: 0
+    };
   }
 };

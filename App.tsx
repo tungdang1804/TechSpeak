@@ -1,18 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
-import { LESSONS, APP_ASSETS } from './constants';
+import { APP_ASSETS } from './constants';
 import Dashboard from './pages/Dashboard';
 import LessonPage from './pages/LessonPage';
 import NailSpeakHub from './components/NailSpeakHub';
 import StarDetective from './components/StarDetective';
 import DailyChallengeHub from './components/DailyChallengeHub';
-import { UserProgress } from './types';
+import { UserProgress, Lesson } from './types';
 import { getVoicePreference, setVoicePreference, VoiceGender, playAudio } from './utils/audioUtils';
-import { Home, BookOpen, Mic, Settings, User, Trophy, X, Library } from 'lucide-react';
+import { fetchLessonsFromManifest } from './services/dataService';
+import { Home, BookOpen, Mic, Settings, User, Trophy, X, Library, Loader2 } from 'lucide-react';
 
 type TabId = 'home' | 'roadmap' | 'practice' | 'profile';
 
 function App() {
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('home');
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [isChallengeHubOpen, setIsChallengeHubOpen] = useState(false);
@@ -23,10 +26,29 @@ function App() {
     const saved = localStorage.getItem('techSpeakProgress');
     return saved ? JSON.parse(saved) : { 
       completedLessons: [], 
-      unlockedLessons: ['lesson_1'],
+      unlockedLessons: [],
       bestScores: {}
     };
   });
+
+  // Fetch lessons on mount
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchLessonsFromManifest();
+      setLessons(data);
+      
+      // Initialize first lesson if none unlocked
+      if (progress.unlockedLessons.length === 0 && data.length > 0) {
+        setProgress(prev => ({
+          ...prev,
+          unlockedLessons: [data[0].id]
+        }));
+      }
+      
+      setIsLoading(false);
+    };
+    loadData();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('techSpeakProgress', JSON.stringify(progress));
@@ -52,8 +74,9 @@ function App() {
       });
       const isAlreadyCompleted = prev.completedLessons.includes(id);
       const newCompleted = isAlreadyCompleted ? prev.completedLessons : [...prev.completedLessons, id];
-      const currentLessonIndex = LESSONS.findIndex(l => l.id === id);
-      const nextLesson = LESSONS[currentLessonIndex + 1];
+      
+      const currentLessonIndex = lessons.findIndex(l => l.id === id);
+      const nextLesson = lessons[currentLessonIndex + 1];
       const newUnlocked = [...prev.unlockedLessons];
       if (nextLesson && !newUnlocked.includes(nextLesson.id)) {
         newUnlocked.push(nextLesson.id);
@@ -69,10 +92,20 @@ function App() {
     playAudio(newGender === 'female' ? "Female voice activated." : "Male voice activated.");
   };
 
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-app-bg max-w-md mx-auto">
+        <Loader2 size={48} className="text-app-primary animate-spin mb-4" />
+        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Đang tải học liệu...</p>
+      </div>
+    );
+  }
+
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'home':
         return <Dashboard 
+          lessons={lessons}
           onSelectLesson={(id) => setActiveLessonId(id)} 
           onSelectPractice={() => setIsChallengeHubOpen(true)}
           onViewRoadmap={() => setActiveTab('roadmap')}
@@ -88,7 +121,7 @@ function App() {
               Lộ trình Star Spa
             </h2>
             <div className="space-y-4">
-              {LESSONS.map((lesson) => (
+              {lessons.map((lesson) => (
                 <button 
                   key={lesson.id}
                   onClick={() => setActiveLessonId(lesson.id)}
@@ -109,6 +142,7 @@ function App() {
         );
       case 'practice':
         return <NailSpeakHub 
+          lessons={lessons}
           onBack={() => setActiveTab('home')} 
           progress={progress} 
           onScoreUpdate={handleScoreUpdate} 
@@ -142,7 +176,7 @@ function App() {
     }
   };
 
-  const activeLesson = LESSONS.find(l => l.id === activeLessonId);
+  const activeLesson = lessons.find(l => l.id === activeLessonId);
 
   return (
     <div className="max-w-md mx-auto app-container bg-app-bg shadow-2xl relative border-x border-slate-100">
@@ -178,7 +212,7 @@ function App() {
         <div className="fixed inset-0 z-[60] bg-white animate-slide-up overflow-hidden">
           < LessonPage 
             lesson={activeLesson} 
-            allLessons={LESSONS}
+            allLessons={lessons}
             onSelectLesson={(id) => setActiveLessonId(id)}
             onBack={() => setActiveLessonId(null)}
             onComplete={handleLessonComplete}
@@ -206,7 +240,7 @@ function App() {
         </div>
       )}
 
-      {/* Star Detective Game Overlay (Listening Challenge) */}
+      {/* Star Detective Game Overlay */}
       {activeChallenge === 'listening' && (
         <div className="fixed inset-0 z-[80] bg-app-bg animate-slide-up overflow-hidden flex flex-col">
           <div className="h-16 px-6 flex items-center justify-between bg-white border-b border-slate-100 shrink-0">

@@ -1,24 +1,24 @@
 
 import React from 'react';
-import { LESSONS } from '../constants';
 import LessonCard from '../components/LessonCard';
-import { LessonStatus, UserProgress } from '../types';
-import { Sparkles, Star, ChevronRight, Zap, LayoutGrid, Hammer, Wine, Briefcase, PlayCircle, Trophy, Target } from 'lucide-react';
+import { Lesson, LessonStatus, UserProgress } from '../types';
+import { Sparkles, Star, Zap, LayoutGrid, Trophy, PlayCircle, Target } from 'lucide-react';
 
 interface DashboardProps {
+  lessons: Lesson[];
   onSelectLesson: (id: string) => void;
   onSelectPractice?: () => void;
   onViewRoadmap?: () => void;
   progress: UserProgress;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onSelectLesson, onSelectPractice, onViewRoadmap, progress }) => {
+const Dashboard: React.FC<DashboardProps> = ({ lessons, onSelectLesson, onSelectPractice, onViewRoadmap, progress }) => {
   const getStatus = (lessonId: string): LessonStatus => {
     if (progress.completedLessons.includes(lessonId)) return LessonStatus.COMPLETED;
     return LessonStatus.UNLOCKED;
   };
 
-  const nextLesson = LESSONS.find(l => !progress.completedLessons.includes(l.id)) || LESSONS[0];
+  const nextLesson = lessons.find(l => !progress.completedLessons.includes(l.id)) || lessons[0];
 
   const scores = Object.values(progress.bestScores) as number[];
   const averageScore = scores.length > 0 
@@ -27,7 +27,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectLesson, onSelectPractice,
 
   return (
     <div className="pb-32">
-      {/* 1. Hero Header - Overall Progress */}
       <div className="p-5">
         <div className="bg-gradient-to-br from-app-primary to-app-secondary rounded-4xl p-8 text-white soft-shadow relative overflow-hidden border border-white/10">
           <div className="absolute -right-10 -bottom-10 opacity-10 transform rotate-12 scale-150">
@@ -49,18 +48,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectLesson, onSelectPractice,
               <div className="flex-1 bg-black/10 h-2 rounded-full overflow-hidden backdrop-blur-sm">
                 <div 
                   className="h-full bg-white transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]" 
-                  style={{ width: `${(progress.completedLessons.length / LESSONS.length) * 100}%` }}
+                  style={{ width: `${(progress.completedLessons.length / Math.max(lessons.length, 1)) * 100}%` }}
                 ></div>
               </div>
               <span className="text-[10px] font-black text-white/80">
-                {Math.round((progress.completedLessons.length / LESSONS.length) * 100)}%
+                {Math.round((progress.completedLessons.length / Math.max(lessons.length, 1)) * 100)}%
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Performance Stats - Moved up for immediate feedback */}
       <div className="px-5 grid grid-cols-2 gap-4 mb-8">
         <div className="bg-white p-5 rounded-[32px] soft-shadow flex flex-col items-center text-center border border-slate-50">
           <div className="w-10 h-10 bg-app-accent/10 text-app-accent rounded-2xl flex items-center justify-center mb-2">
@@ -78,7 +76,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectLesson, onSelectPractice,
         </div>
       </div>
 
-      {/* 3. Daily Challenge Widget - Most important interactive element */}
       <div className="px-5 mb-8">
         <button 
           onClick={onSelectPractice}
@@ -103,27 +100,27 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectLesson, onSelectPractice,
         </button>
       </div>
 
-      {/* 4. Next Lesson - Compact View */}
-      <div className="px-5 mb-10">
-        <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-            <Target size={14} /> BÀI HỌC TIẾP THEO
-          </h3>
-          <button 
-            onClick={onViewRoadmap}
-            className="text-[10px] font-black text-app-primary uppercase tracking-widest hover:underline"
-          >
-            Xem lộ trình
-          </button>
+      {nextLesson && (
+        <div className="px-5 mb-10">
+          <div className="flex items-center justify-between mb-4 px-1">
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <Target size={14} /> BÀI HỌC TIẾP THEO
+            </h3>
+            <button 
+              onClick={onViewRoadmap}
+              className="text-[10px] font-black text-app-primary uppercase tracking-widest hover:underline"
+            >
+              Xem lộ trình
+            </button>
+          </div>
+          <LessonCard 
+            lesson={nextLesson}
+            status={getStatus(nextLesson.id)}
+            onClick={() => onSelectLesson(nextLesson.id)}
+          />
         </div>
-        <LessonCard 
-          lesson={nextLesson}
-          status={getStatus(nextLesson.id)}
-          onClick={() => onSelectLesson(nextLesson.id)}
-        />
-      </div>
+      )}
 
-      {/* 5. Specialty Selector */}
       <div className="px-5">
         <div className="flex items-center justify-between mb-4 px-1">
           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -137,14 +134,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectLesson, onSelectPractice,
             </div>
             <span className="text-[9px] font-black uppercase tracking-widest text-app-primary">Nail Spa</span>
           </div>
-          {['🏗️', '🍹', '⚙️'].map((emoji, i) => (
-            <div key={i} className="flex flex-col items-center gap-3 min-w-[80px] opacity-40 grayscale">
-              <div className="w-16 h-16 rounded-[24px] bg-white border border-slate-200 flex items-center justify-center">
-                <span className="text-2xl">{emoji}</span>
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Coming soon</span>
-            </div>
-          ))}
         </div>
       </div>
     </div>

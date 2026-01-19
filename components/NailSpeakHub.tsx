@@ -1,13 +1,14 @@
 
 import React, { useState, useMemo } from 'react';
-import { LESSONS, IPA_SOUNDS } from '../constants';
-import { SPECIALIZED_VOCAB, SpecialVocabItem } from '../data/specialVocab';
-import { UserProgress, IPASound } from '../types';
-import { ArrowLeft, Mic, Volume2, Sparkles, Book, ChevronDown, CheckCircle, Library, Palette, Ruler } from 'lucide-react';
+import { IPA_SOUNDS } from '../constants';
+import { SPECIALIZED_VOCAB } from '../data/specialVocab';
+import { UserProgress, IPASound, Lesson } from '../types';
+import { ArrowLeft, Volume2, ChevronDown, CheckCircle, Library } from 'lucide-react';
 import NailSpeakScore from './NailSpeakScore';
 import { playAudio } from '../utils/audioUtils';
 
 interface NailSpeakHubProps {
+  lessons: Lesson[];
   onBack: () => void;
   progress: UserProgress;
   onScoreUpdate: (text: string, score: number) => void;
@@ -46,7 +47,7 @@ const HighlightIPA: React.FC<{ text: string; target: string }> = ({ text, target
   );
 };
 
-const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUpdate }) => {
+const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ lessons, onBack, progress, onScoreUpdate }) => {
   const [activeTab, setActiveTab] = useState<Tab>('ipa');
   const [selectedItem, setSelectedItem] = useState<PracticeItem | null>(null);
   const [selectedIPA, setSelectedIPA] = useState<IPASound>(IPA_SOUNDS[0]);
@@ -54,7 +55,6 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
   const [expandedGroupKey, setExpandedGroupKey] = useState<string | null>("special_0");
 
   const vocabByLesson = useMemo<PracticeGroup[]>(() => {
-    // 1. Kho chuyên ngành đầu tiên
     const specializedGroups: PracticeGroup[] = SPECIALIZED_VOCAB.map((group, idx) => ({
       lessonTitle: group.title,
       icon: group.icon,
@@ -65,8 +65,7 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
       })))
     }));
 
-    // 2. Từ vựng theo bài học
-    const lessonVocab: PracticeGroup[] = LESSONS.map(lesson => ({
+    const lessonVocab: PracticeGroup[] = lessons.map(lesson => ({
       lessonTitle: lesson.title,
       items: lesson.vocabularies.map(v => ({ 
         id: v.id, 
@@ -77,10 +76,10 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
     })).filter(group => group.items.length > 0);
 
     return [...specializedGroups, ...lessonVocab];
-  }, []);
+  }, [lessons]);
 
   const grammarByLesson = useMemo<PracticeGroup[]>(() => {
-    return LESSONS.map(lesson => ({
+    return lessons.map(lesson => ({
       lessonTitle: lesson.title,
       items: lesson.grammarPoints.flatMap(gp => 
         gp.examples.map((ex, idx) => ({ 
@@ -91,7 +90,7 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
         }))
       )
     })).filter(group => group.items.length > 0);
-  }, []);
+  }, [lessons]);
 
   React.useEffect(() => {
     setSelectedItem(null);
@@ -114,14 +113,12 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
               </span>
           </div>
         </div>
-
         <div className="mb-4">
           <p className="text-slate-600 text-sm leading-relaxed">
             <span className="font-bold mr-1 text-app-text">👄 Cách đọc:</span>
             {selectedIPA.description}
           </p>
         </div>
-
         <div className="bg-slate-50 rounded-2xl p-4">
            <p className="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest">Ví dụ ngành Nail:</p>
            <div className="grid grid-cols-1 gap-2">
@@ -148,11 +145,6 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
   const renderIPA = () => (
     <div className="p-4 pb-20">
       {renderIPADetails()}
-      
-      <div className="bg-slate-100/50 p-3 rounded-xl mb-6 text-center border border-slate-100">
-        <p className="text-xs text-slate-400 font-medium italic">Chọn một ký tự để xem chi tiết</p>
-      </div>
-      
       <h4 className="font-black text-app-text text-[11px] mb-4 flex items-center gap-2 uppercase tracking-widest">
         <span className="w-1 h-3.5 bg-app-primary rounded-full"></span> Nguyên âm đơn
       </h4>
@@ -171,50 +163,6 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
             }`}
           >
             <span className="text-xl font-bold font-serif">{s.symbol}</span>
-          </button>
-        ))}
-      </div>
-
-      <h4 className="font-black text-app-text text-[11px] mb-4 flex items-center gap-2 uppercase tracking-widest">
-        <span className="w-1 h-3.5 bg-app-secondary rounded-full"></span> Nguyên âm đôi
-      </h4>
-      <div className="grid grid-cols-4 gap-2 mb-8">
-        {IPA_SOUNDS.filter(s => s.type === 'diphthong').map((s) => (
-          <button 
-            key={s.symbol}
-            onClick={() => {
-                setSelectedIPA(s);
-                document.querySelector('.custom-scrollbar')?.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className={`flex flex-col items-center justify-center py-3 rounded-xl border transition-all ${
-                selectedIPA.symbol === s.symbol 
-                ? 'bg-app-primary text-white border-app-primary soft-shadow scale-105' 
-                : 'bg-white text-app-text border-slate-100'
-            }`}
-          >
-            <span className="text-lg font-bold font-serif">{s.symbol}</span>
-          </button>
-        ))}
-      </div>
-
-      <h4 className="font-black text-app-text text-[11px] mb-4 flex items-center gap-2 uppercase tracking-widest">
-        <span className="w-1 h-3.5 bg-app-accent rounded-full"></span> Phụ âm
-      </h4>
-      <div className="grid grid-cols-5 gap-2">
-        {IPA_SOUNDS.filter(s => s.type === 'consonant').map((s) => (
-          <button 
-            key={s.symbol}
-            onClick={() => {
-                setSelectedIPA(s);
-                document.querySelector('.custom-scrollbar')?.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all ${
-                selectedIPA.symbol === s.symbol 
-                ? 'bg-app-primary text-white border-app-primary soft-shadow scale-105' 
-                : 'bg-white text-app-text border-slate-100'
-            }`}
-          >
-            <span className="text-lg font-bold font-serif">{s.symbol}</span>
           </button>
         ))}
       </div>
@@ -253,7 +201,6 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
                     <ChevronDown size={18} />
                   </div>
                 </button>
-
                 {isOpen && (
                   <div className="p-3 bg-slate-50/50 border-t border-slate-100 grid grid-cols-2 gap-2 animate-fade-in">
                     {group.items.map(item => {
@@ -286,18 +233,15 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
             );
           })}
         </div>
-
         {selectedItem && (
           <div className="mt-6 w-full animate-fade-in-up pb-10">
              <div className="bg-white p-6 rounded-5xl soft-shadow text-center relative overflow-hidden border border-white/50">
                 <div className="absolute top-0 left-0 w-full h-1.5 header-gradient opacity-50"></div>
-                
                 {selectedItem.tag && (
                   <span className="inline-block mb-3 bg-app-primary/5 text-app-primary text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
                     {selectedItem.tag}
                   </span>
                 )}
-                
                 {selectedItem.ipa && (
                    <div className="mb-4">
                       <span className="font-mono text-slate-400 bg-slate-50 px-4 py-1.5 rounded-xl text-xl tracking-wide border border-slate-100">
@@ -305,9 +249,7 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
                       </span>
                    </div>
                 )}
-
                 <p className="text-lg text-app-text font-black mb-6">"{selectedItem.sub}"</p>
-                
                 <button 
                   onClick={() => playAudio(selectedItem.text)}
                   className="w-full flex items-center justify-center gap-3 bg-app-primary/5 text-app-primary py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest mb-6 active:scale-95 transition"
@@ -315,7 +257,6 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
                   <Volume2 size={20} />
                   <span>Nghe mẫu phát âm</span>
                 </button>
-
                 <NailSpeakScore 
                   targetText={selectedItem.text}
                   bestScore={progress.bestScores[selectedItem.text] || 0}
@@ -341,29 +282,12 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
           </div>
           <div className="w-10"></div>
         </div>
-
         <div className="flex p-1 bg-slate-100/50 rounded-2xl">
-          <button 
-            onClick={() => setActiveTab('ipa')}
-            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl transition-all ${activeTab === 'ipa' ? 'bg-white text-app-primary shadow-sm' : 'text-slate-400'}`}
-          >
-            IPA
-          </button>
-          <button 
-             onClick={() => setActiveTab('vocab')}
-             className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl transition-all ${activeTab === 'vocab' ? 'bg-white text-app-primary shadow-sm' : 'text-slate-400'}`}
-          >
-            Từ vựng
-          </button>
-          <button 
-             onClick={() => setActiveTab('grammar')}
-             className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-app-primary shadow-sm' : 'text-slate-400'}`}
-          >
-            Cấu trúc
-          </button>
+          <button onClick={() => setActiveTab('ipa')} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl transition-all ${activeTab === 'ipa' ? 'bg-white text-app-primary shadow-sm' : 'text-slate-400'}`}>IPA</button>
+          <button onClick={() => setActiveTab('vocab')} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl transition-all ${activeTab === 'vocab' ? 'bg-white text-app-primary shadow-sm' : 'text-slate-400'}`}>Từ vựng</button>
+          <button onClick={() => setActiveTab('grammar')} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl transition-all ${activeTab === 'grammar' ? 'bg-white text-app-primary shadow-sm' : 'text-slate-400'}`}>Cấu trúc</button>
         </div>
       </div>
-
       <div className="flex-1 overflow-hidden">
         {activeTab === 'ipa' && <div className="h-full overflow-y-auto custom-scrollbar">{renderIPA()}</div>}
         {activeTab === 'vocab' && renderPracticeList(vocabByLesson)}
