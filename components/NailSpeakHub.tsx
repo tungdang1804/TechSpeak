@@ -1,8 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { LESSONS, IPA_SOUNDS } from '../constants';
+import { SPECIALIZED_VOCAB, SpecialVocabItem } from '../data/specialVocab';
 import { UserProgress, IPASound } from '../types';
-import { ArrowLeft, Mic, Volume2, Sparkles, Book, ChevronDown, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mic, Volume2, Sparkles, Book, ChevronDown, CheckCircle, Library, Palette, Ruler } from 'lucide-react';
 import NailSpeakScore from './NailSpeakScore';
 import { playAudio } from '../utils/audioUtils';
 
@@ -24,6 +25,8 @@ interface PracticeItem {
 
 interface PracticeGroup {
   lessonTitle: string;
+  icon?: string;
+  isSpecialized?: boolean;
   items: PracticeItem[];
 }
 
@@ -48,12 +51,22 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
   const [selectedItem, setSelectedItem] = useState<PracticeItem | null>(null);
   const [selectedIPA, setSelectedIPA] = useState<IPASound>(IPA_SOUNDS[0]);
   
-  const [expandedGroupIndex, setExpandedGroupIndex] = useState<number | null>(0);
-
-  const allLessons = LESSONS;
+  const [expandedGroupKey, setExpandedGroupKey] = useState<string | null>("special_0");
 
   const vocabByLesson = useMemo<PracticeGroup[]>(() => {
-    return allLessons.map(lesson => ({
+    // 1. Kho chuyên ngành đầu tiên
+    const specializedGroups: PracticeGroup[] = SPECIALIZED_VOCAB.map((group, idx) => ({
+      lessonTitle: group.title,
+      icon: group.icon,
+      isSpecialized: true,
+      items: group.subGroups.flatMap(sg => sg.items.map(item => ({
+        ...item,
+        tag: sg.name
+      })))
+    }));
+
+    // 2. Từ vựng theo bài học
+    const lessonVocab: PracticeGroup[] = LESSONS.map(lesson => ({
       lessonTitle: lesson.title,
       items: lesson.vocabularies.map(v => ({ 
         id: v.id, 
@@ -62,10 +75,12 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
         ipa: v.ipa 
       }))
     })).filter(group => group.items.length > 0);
-  }, [allLessons]);
+
+    return [...specializedGroups, ...lessonVocab];
+  }, []);
 
   const grammarByLesson = useMemo<PracticeGroup[]>(() => {
-    return allLessons.map(lesson => ({
+    return LESSONS.map(lesson => ({
       lessonTitle: lesson.title,
       items: lesson.grammarPoints.flatMap(gp => 
         gp.examples.map((ex, idx) => ({ 
@@ -76,15 +91,15 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
         }))
       )
     })).filter(group => group.items.length > 0);
-  }, [allLessons]);
+  }, []);
 
   React.useEffect(() => {
     setSelectedItem(null);
-    setExpandedGroupIndex(0); 
+    setExpandedGroupKey("special_0"); 
   }, [activeTab]);
 
-  const toggleGroup = (index: number) => {
-    setExpandedGroupIndex(prev => (prev === index ? null : index));
+  const toggleGroup = (key: string) => {
+    setExpandedGroupKey(prev => (prev === key ? null : key));
   };
 
   const renderIPADetails = () => {
@@ -211,20 +226,30 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
         <div className="space-y-3">
           {groups.map((group, groupIdx) => {
-            const isOpen = expandedGroupIndex === groupIdx;
+            const key = group.isSpecialized ? `special_${groupIdx}` : `lesson_${groupIdx}`;
+            const isOpen = expandedGroupKey === key;
             return (
-              <div key={groupIdx} className="bg-white rounded-3xl soft-shadow border border-white/50 overflow-hidden transition-all duration-300">
+              <div key={key} className={`bg-white rounded-3xl soft-shadow border overflow-hidden transition-all duration-300 ${group.isSpecialized ? 'border-app-accent/30' : 'border-white/50'}`}>
                 <button 
-                  onClick={() => toggleGroup(groupIdx)}
-                  className={`w-full flex items-center justify-between p-4 text-left transition-colors ${isOpen ? 'bg-app-primary/5' : 'bg-white'}`}
+                  onClick={() => toggleGroup(key)}
+                  className={`w-full flex items-center justify-between p-4 text-left transition-colors ${isOpen ? (group.isSpecialized ? 'bg-app-accent/5' : 'bg-app-primary/5') : 'bg-white'}`}
                 >
-                  <div>
-                    <span className="text-[9px] font-black text-app-primary uppercase tracking-[0.2em] block mb-0.5">
-                      Bài {groupIdx + 1}
-                    </span>
-                    <h3 className="font-black text-app-text text-sm">{group.lessonTitle}</h3>
+                  <div className="flex items-center gap-3">
+                    {group.icon ? (
+                      <div className="w-10 h-10 bg-app-accent/10 rounded-xl flex items-center justify-center text-xl">{group.icon}</div>
+                    ) : (
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm ${isOpen ? 'bg-app-primary text-white' : 'bg-slate-50 text-slate-400'}`}>
+                        {group.isSpecialized ? '★' : groupIdx - (groups.filter(g => g.isSpecialized).length) + 1}
+                      </div>
+                    )}
+                    <div>
+                      <span className={`text-[9px] font-black uppercase tracking-[0.2em] block mb-0.5 ${group.isSpecialized ? 'text-app-accent' : 'text-app-primary'}`}>
+                        {group.isSpecialized ? "KHO CHUYÊN NGÀNH" : `BÀI ${groupIdx - (groups.filter(g => g.isSpecialized).length) + 1}`}
+                      </span>
+                      <h3 className="font-black text-app-text text-sm leading-tight">{group.lessonTitle}</h3>
+                    </div>
                   </div>
-                  <div className={`text-app-primary transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                  <div className={`${group.isSpecialized ? 'text-app-accent' : 'text-app-primary'} transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
                     <ChevronDown size={18} />
                   </div>
                 </button>
@@ -311,8 +336,8 @@ const NailSpeakHub: React.FC<NailSpeakHubProps> = ({ onBack, progress, onScoreUp
             <ArrowLeft size={24} />
           </button>
           <div className="flex items-center gap-2 text-app-primary font-black text-lg tracking-tight">
-            <Mic size={20} className="text-app-primary" />
-            NailSpeak Center
+            <Library size={20} className="text-app-primary" />
+            Thư viện Star Spa
           </div>
           <div className="w-10"></div>
         </div>

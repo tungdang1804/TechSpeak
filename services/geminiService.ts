@@ -2,17 +2,23 @@
 import { GoogleGenAI, Chat, Type } from "@google/genai";
 import { GameRound, GameChoice } from "../types";
 
-const createAIClient = () => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey || apiKey === "AIzaSy...") return null;
-  return new GoogleGenAI({ apiKey });
-};
+// Define the response shape for roleplay turns
+export interface RoleplayTurnResponse {
+  ai_response: string;
+  user_transcript: string;
+  score: number;
+  feedback: string;
+  satisfaction: number;
+  is_finished: boolean;
+}
 
-// --- Star Detective AI Generator ---
+// Helper to create AI client using process.env.API_KEY directly
+const createAIClient = () => {
+  return new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+};
 
 export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRound[]> => {
   const ai = createAIClient();
-  if (!ai) return [];
 
   const choicesContext = choices.map(c => `[ID: ${c.id}, Category: ${c.category}, Label: ${c.label}]`).join(', ');
 
@@ -20,15 +26,24 @@ export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRou
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `
-        You are a customer at Star Spa (a luxury nail salon). 
-        Create 5 unique and realistic requests. 
-        Each request must include a mix of 2-3 items from these available choices: ${choicesContext}.
+        You are an AI creating English listening challenges for a Nail Salon app.
+        Generate 5 rounds. Each round must belong to ONE of these categories:
+        - BOOKING (Time, people)
+        - TECHNICAL (Shape, style, tools)
+        - ASSISTANCE (Helping coworkers)
+        - PAYMENT (Price, tip, method)
+        
+        CRITICAL RULES:
+        1. The 'correctIds' MUST match the KEYWORDS mentioned in the 'audioText'. 
+        2. If the customer says "Not today, maybe tomorrow", only 'tomorrow' is a correct ID.
+        3. Use ONLY IDs provided in this list: ${choicesContext}.
         
         Return a JSON ARRAY of 5 objects:
         {
-          "id": "unique_id",
-          "audioText": "Natural English sentence of the request",
-          "correctIds": ["list", "of", "matching", "ids", "from", "the", "choices"]
+          "id": "round_index",
+          "category": "The category name",
+          "audioText": "A natural, realistic English sentence",
+          "correctIds": ["list", "of", "matching", "ids"]
         }
       `,
       config: {
@@ -39,20 +54,20 @@ export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRou
             type: Type.OBJECT,
             properties: {
               id: { type: Type.STRING },
+              category: { type: Type.STRING },
               audioText: { type: Type.STRING },
               correctIds: { type: Type.ARRAY, items: { type: Type.STRING } }
             },
-            required: ["id", "audioText", "correctIds"]
+            required: ["id", "category", "audioText", "correctIds"]
           }
         }
       }
     });
 
-    const generated = JSON.parse(response.text);
-    // Map back to GameRound format by injecting the choices
+    const generated = JSON.parse(response.text || '[]');
     return generated.map((g: any) => ({
       ...g,
-      choices: choices // Re-use the full menu for each round to keep it challenging
+      choices: choices 
     }));
   } catch (error) {
     console.error("Game Generation Error:", error);
@@ -60,8 +75,6 @@ export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRou
   }
 };
 
-// --- Pronunciation Assessment ---
-// ... (giữ nguyên code cũ)
 export interface PronunciationResult {
   score: number;
   feedback: string;
@@ -69,7 +82,6 @@ export interface PronunciationResult {
 
 export const assessPronunciation = async (audioBase64: string, targetText: string, mimeType: string = 'audio/webm'): Promise<PronunciationResult> => {
   const ai = createAIClient();
-  if (!ai) return { score: 0, feedback: "Lỗi: Chưa cấu hình API Key." };
   const effectiveMimeType = mimeType && mimeType.trim() !== '' ? mimeType : 'audio/webm';
   try {
     const response = await ai.models.generateContent({
@@ -89,26 +101,15 @@ export const assessPronunciation = async (audioBase64: string, targetText: strin
         }
       }
     });
-    return JSON.parse(response.text) as PronunciationResult;
+    return JSON.parse(response.text || '{"score": 0, "feedback": "No response"}') as PronunciationResult;
   } catch (error) {
     console.error("Pronunciation Check Error:", error);
     return { score: 0, feedback: "Lỗi kết nối AI." };
   }
 };
 
-// ... (giữ nguyên code roleplay cũ)
-export interface RoleplayTurnResponse {
-  ai_response: string;
-  user_transcript: string;
-  score: number;
-  feedback: string;
-  satisfaction: number;
-  is_finished: boolean;
-}
-
 export const createRoleplaySession = (context: string) => {
   const ai = createAIClient();
-  if (!ai) return null;
   const systemInstruction = `You are a character in a Technical Workplace setting. Context: ${context}. Interaction Rules: 1. Communicate naturally. 2. Evaluate user's technical accuracy, politeness, and clarity. 3. Include a "satisfaction" score (0-100). 4. Feedback must be in Vietnamese. 5. Occasionally introduce "random variables" to test flexibility.`;
   return ai.chats.create({
     model: 'gemini-3-flash-preview',
@@ -133,7 +134,7 @@ export const sendRoleplayMessage = async (chat: Chat, audioBase64: string | null
     if (textInput) parts.push({ text: textInput });
     if (parts.length === 0) parts.push({ text: "Start roleplay." });
     const result = await chat.sendMessage({ message: parts });
-    return JSON.parse(result.text) as RoleplayTurnResponse;
+    return JSON.parse(result.text || '{}') as RoleplayTurnResponse;
   } catch (error) {
     console.error("Roleplay API Error:", error);
     return { ai_response: "Lỗi kết nối.", user_transcript: "", score: 0, feedback: "Lỗi AI.", satisfaction: 50, is_finished: false };

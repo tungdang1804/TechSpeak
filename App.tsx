@@ -8,7 +8,7 @@ import StarDetective from './components/StarDetective';
 import DailyChallengeHub from './components/DailyChallengeHub';
 import { UserProgress } from './types';
 import { getVoicePreference, setVoicePreference, VoiceGender, playAudio } from './utils/audioUtils';
-import { Home, BookOpen, Mic, Settings, User, Trophy, X } from 'lucide-react';
+import { Home, BookOpen, Mic, Settings, User, Trophy, X, Library } from 'lucide-react';
 
 type TabId = 'home' | 'roadmap' | 'practice' | 'profile';
 
@@ -169,7 +169,7 @@ function App() {
       <div className="bg-white border-t border-slate-100 flex items-center justify-around px-4 pb-safe pt-2 z-40 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] min-h-[85px] shrink-0">
         <TabButton active={activeTab === 'home'} icon={<Home size={24} />} label="Home" onClick={() => setActiveTab('home')} />
         <TabButton active={activeTab === 'roadmap'} icon={<BookOpen size={24} />} label="Lộ trình" onClick={() => setActiveTab('roadmap')} />
-        <TabButton active={activeTab === 'practice'} icon={<Mic size={24} />} label="Luyện nói" onClick={() => setActiveTab('practice')} />
+        <TabButton active={activeTab === 'practice'} icon={<Library size={24} />} label="Thư viện" onClick={() => setActiveTab('practice')} />
         <TabButton active={activeTab === 'profile'} icon={<User size={24} />} label="Cá nhân" onClick={() => setActiveTab('profile')} />
       </div>
 
