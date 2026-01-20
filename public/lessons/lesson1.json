@@ -3,52 +3,54 @@
   "id": "lesson_1",
   "order": 1,
   "title": "Proactive Booking",
-  "description": "Chủ động dẫn dắt cuộc gọi đặt lịch: Dịch vụ, Thời gian, Số lượng (Star Spa).",
+  "description": "Chủ động dẫn dắt cuộc gọi đặt lịch: Dịch vụ, Thời gian, Số lượng.",
   "thumbnail": "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?q=80&w=400&auto=format&fit=crop",
-  "contextBackground": "Tình huống diễn ra qua điện thoại khi khách hàng gọi đến tiệm để hỏi lịch hẹn.",
-  "contextGoal": "Nhân viên chủ động dẫn dắt cuộc hội thoại để chốt nhanh 3 thông tin then chốt.",
-  "contextCharacters": [
-    { "name": "Tiên", "role": "Nhân viên tiếp nhận cuộc gọi." },
-    { "name": "Ms. Minh", "role": "Khách hàng gọi điện đặt lịch." }
-  ],
+  "context": {
+    "background": "Tình huống diễn ra qua điện thoại khi khách hàng gọi đến tiệm để hỏi lịch hẹn.",
+    "goal": "Nhân viên chủ động chốt: Dịch vụ, thời gian và số lượng người.",
+    "characters": [
+      { "name": "Tiên", "role": "Nhân viên điều phối." },
+      { "name": "Ms. Minh", "role": "Khách hàng." }
+    ]
+  },
   "steps": [
     {
       "id": "l1_step1",
-      "title": "Bước 1: Lời chào thương hiệu",
-      "purpose": "Khẳng định sự chuyên nghiệp của tiệm",
+      "title": "Bước 1: Lời chào và Nhu cầu",
+      "purpose": "Khẳng định sự chuyên nghiệp",
       "lines": [
         {
           "id": "l1_s1_tech",
           "speaker": "Tech",
           "text": "Hello, Star Spa speaking. How can I help you today?",
-          "translation": "Xin chào, tiệm Star Spa xin nghe. Tôi có thể giúp gì cho bạn hôm nay ạ?",
+          "translation": "Xin chào, Star Spa xin nghe. Tôi có thể giúp gì cho bạn?",
           "variations": [
-            { "id": "l1_v1_1", "text": "Hi! This is Star Spa. Would you like to book an appointment?", "translation": "Chào bạn! Đây là tiệm Star Spa. Bạn muốn đặt lịch hẹn phải không ạ?" }
+            { "id": "v1", "text": "Hi! This is Star Spa. Would you like to book an appointment?", "translation": "Chào bạn! Đây là Star Spa. Bạn muốn đặt lịch hẹn đúng không?" }
           ]
         },
         {
           "id": "l1_s1_cust",
           "speaker": "Customer",
           "text": "Hi, I want to book an appointment for tomorrow.",
-          "translation": "Chào bạn, tôi muốn đặt lịch hẹn cho ngày mai."
+          "translation": "Chào bạn, tôi muốn đặt lịch cho ngày mai."
         }
       ]
     }
   ],
   "vocabularies": [
-    { "id": "voc1", "word": "Appointment", "translation": "Lịch hẹn", "ipa": "/əˈpɔɪntmənt/" },
-    { "id": "voc2", "word": "Available", "translation": "Còn trống", "ipa": "/əˈveɪləbl/" }
+    { "id": "v1", "word": "Appointment", "translation": "Lịch hẹn", "ipa": "/əˈpɔɪntmənt/" },
+    { "id": "v2", "word": "Available", "translation": "Còn trống", "ipa": "/əˈveɪləbl/" }
   ],
-  "grammarPoints": [
+  "grammar_points": [
     {
       "id": "g1",
       "title": "Cấu trúc hỏi nhu cầu",
-      "description": "Dùng 'What service do you want?' để hỏi trực tiếp.",
-      "examples": [
-        { "english": "What service do you want?", "vietnamese": "Bạn muốn làm dịch vụ gì?" }
-      ]
+      "description": "Dùng 'What service' để hỏi dịch vụ.",
+      "examples": [{ "english": "What service do you want?", "vietnamese": "Bạn muốn làm dịch vụ gì?" }]
     }
   ],
-  "roleplayScenario": "Bạn là nhân viên Tiên đang trực điện thoại tại Star Spa...",
-  "roleplayPrompt": "You are Ms. Minh calling Star Spa. You want to book for tomorrow at 2:30."
+  "roleplay": {
+    "user_instructions": "Bạn là nhân viên Tiên. Hãy chào khách và chốt lịch hẹn cho ngày mai.",
+    "ai_instructions": "You are Ms. Minh calling Star Spa. You want a full set tomorrow at 2:30."
+  }
 }

@@ -8,12 +8,15 @@ export const LESSON_1: Lesson = {
   description: 'Chủ động dẫn dắt cuộc gọi đặt lịch: Dịch vụ, Thời gian, Số lượng (Star Spa).',
   thumbnail: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?q=80&w=400&auto=format&fit=crop',
   
-  contextBackground: 'Tình huống diễn ra qua điện thoại khi khách hàng gọi đến tiệm để hỏi lịch hẹn. Đây là bước tiếp xúc đầu tiên, yêu cầu sự chuyên nghiệp và khả năng điều phối của nhân viên.',
-  contextGoal: 'Nhân viên chủ động dẫn dắt cuộc hội thoại để chốt nhanh 3 thông tin then chốt: Loại dịch vụ, thời gian cụ thể và số lượng người. Cuối cùng, thực hiện xác nhận lại toàn bộ thông tin lịch hẹn một cách lịch sự.',
-  contextCharacters: [
-    { name: 'Tiên', role: 'Nhân viên tiếp nhận cuộc gọi và điều phối lịch.' },
-    { name: 'Ms. Minh', role: 'Khách hàng gọi điện đặt lịch.' }
-  ],
+  // Fix: Group context properties into a context object
+  context: {
+    background: 'Tình huống diễn ra qua điện thoại khi khách hàng gọi đến tiệm để hỏi lịch hẹn. Đây là bước tiếp xúc đầu tiên, yêu cầu sự chuyên nghiệp và khả năng điều phối của nhân viên.',
+    goal: 'Nhân viên chủ động dẫn dắt cuộc hội thoại để chốt nhanh 3 thông tin then chốt: Loại dịch vụ, thời gian cụ thể và số lượng người. Cuối cùng, thực hiện xác nhận lại toàn bộ thông tin lịch hẹn một cách lịch sự.',
+    characters: [
+      { name: 'Tiên', role: 'Nhân viên tiếp nhận cuộc gọi và điều phối lịch.' },
+      { name: 'Ms. Minh', role: 'Khách hàng gọi điện đặt lịch.' }
+    ],
+  },
 
   steps: [
     {
@@ -113,7 +116,8 @@ export const LESSON_1: Lesson = {
     { id: 'voc6', word: 'Speaking', translation: 'Đang nghe máy', ipa: '/ˈspiːkɪŋ/' }
   ],
 
-  grammarPoints: [
+  // Fix: Rename grammarPoints to grammar_points
+  grammar_points: [
     {
       id: 'g1',
       title: 'Cấu trúc hỏi nhu cầu',
@@ -132,16 +136,18 @@ export const LESSON_1: Lesson = {
     }
   ],
 
-  roleplayScenario: `Bạn là nhân viên Tiên đang trực điện thoại tại Star Spa.
+  // Fix: Group roleplay properties into a roleplay object
+  roleplay: {
+    ai_instructions: `Bạn là nhân viên Tiên đang trực điện thoại tại Star Spa.
   
 🎯 Nhiệm vụ:
 - Chào hỏi đúng thương hiệu "Star Spa".
 - Chốt nhanh: Dịch vụ, Số lượng khách, Thời gian.
 - Xác nhận lại toàn bộ thông tin để tránh nhầm lẫn.`,
-
-  roleplayPrompt: `You are Ms. Minh calling Star Spa.
+    user_instructions: `You are Ms. Minh calling Star Spa.
   Behavior:
   - You want to book for tomorrow at 2:30.
   - You want a full set and a pedicure.
   - You only provide your name (Minh) when asked.`
+  }
 };

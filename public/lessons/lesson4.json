@@ -1,0 +1,54 @@
+
+{
+  "id": "lesson_4",
+  "order": 4,
+  "title": "Nail Extension & Shaping",
+  "description": "Kỹ thuật dũa nhám, gắn móng tip, đắp gel và tạo dáng móng (Almond, Square, Coffin).",
+  "thumbnail": "https://images.unsplash.com/photo-1604902396830-aca29e19b067?q=80&w=400&auto=format&fit=crop",
+  "context": {
+    "background": "Sau khi làm sạch da, Hân bắt đầu xử lý bề mặt móng để chuẩn bị gắn móng giả. Đây là giai đoạn kỹ thuật then chốt để đảm bảo độ bền.",
+    "goal": "Thực hiện quy trình chuẩn bị bề mặt, tư vấn và thực hiện các kỹ thuật nối móng, đồng thời kiểm tra độ cân đối.",
+    "characters": [
+      { "name": "Hân", "role": "Kỹ thuật viên thực hiện kỹ thuật chính." },
+      { "name": "Mi", "role": "Học viên quan sát." },
+      { "name": "Ms. Minh", "role": "Khách hàng chọn dáng móng." }
+    ]
+  },
+  "steps": [
+    {
+      "id": "l4_step1",
+      "title": "Bước 1: Chuẩn bị bề mặt",
+      "purpose": "Giải thích lý do mài nhám để tăng độ bám dính",
+      "lines": [
+        {
+          "id": "l4_s1_tech",
+          "speaker": "Tech",
+          "text": "Before we start, we need to buff the surface so that the gel stays longer.",
+          "translation": "Trước khi bắt đầu, mình cần dũa nhám bề mặt để lớp gel bám bền hơn."
+        },
+        {
+          "id": "l4_s1_cust",
+          "speaker": "Customer",
+          "text": "Okay, I'm ready.",
+          "translation": "Được rồi, tôi sẵn sàng."
+        }
+      ]
+    }
+  ],
+  "vocabularies": [
+    { "id": "l4_v1", "word": "Buff", "translation": "Dũa nhám", "ipa": "/bʌf/" },
+    { "id": "l4_v6", "word": "Almond shape", "translation": "Dáng hạnh nhân", "ipa": "/ˈɑːmənd ʃeɪp/" }
+  ],
+  "grammar_points": [
+    {
+      "id": "l4_g1",
+      "title": "Cấu trúc mục đích",
+      "description": "Dùng 'so that' để giải thích kết quả của hành động.",
+      "examples": [{ "english": "I buff the surface so that the gel stays longer.", "vietnamese": "Em mài nhám để gel bền hơn." }]
+    }
+  ],
+  "roleplay": {
+    "ai_instructions": "Bạn là Hân đang tạo form móng. Hãy tư vấn dáng Almond cho khách.",
+    "user_instructions": "You are Ms. Minh. You want medium length and want to make sure the nails are straight."
+  }
+}

@@ -8,13 +8,16 @@ export const LESSON_5: Lesson = {
   description: 'Nghệ thuật sơn gel, vẽ trang trí (French tips, charms) và phủ bóng hoàn thiện.',
   thumbnail: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop',
   
-  contextBackground: 'Móng đã có form chuẩn. Hân bắt đầu quy trình sơn gel và trang trí nghệ thuật. Đây là giai đoạn tương tác mạnh về màu sắc và yêu cầu khách hàng phối hợp thao tác với thiết bị (đèn LED/UV).',
-  contextGoal: 'Sử dụng các câu mệnh lệnh để điều hướng khách hơ đèn, thực hiện thử màu (Color test) và xác nhận các chi tiết trang trí. Đồng thời, nhân viên cần biết cách trấn an khi khách lo lắng về kỹ thuật.',
-  contextCharacters: [
-    { name: 'Hân', role: 'Kỹ thuật viên trang trí móng.' },
-    { name: 'Ms. Minh', role: 'Khách hàng chọn màu và đính đá.' },
-    { name: 'Mi', role: 'Học viên quan sát lớp bóng hoàn thiện.' }
-  ],
+  // Fix: Group context properties into a context object
+  context: {
+    background: 'Móng đã có form chuẩn. Hân bắt đầu quy trình sơn gel và trang trí nghệ thuật. Đây là giai đoạn tương tác mạnh về màu sắc và yêu cầu khách hàng phối hợp thao tác với thiết bị (đèn LED/UV).',
+    goal: 'Sử dụng các câu mệnh lệnh để điều hướng khách hơ đèn, thực hiện thử màu (Color test) và xác nhận các chi tiết trang trí. Đồng thời, nhân viên cần biết cách trấn an khi khách lo lắng về kỹ thuật.',
+    characters: [
+      { name: 'Hân', role: 'Kỹ thuật viên trang trí móng.' },
+      { name: 'Ms. Minh', role: 'Khách hàng chọn màu và đính đá.' },
+      { name: 'Mi', role: 'Học viên quan sát lớp bóng hoàn thiện.' }
+    ],
+  },
 
   steps: [
     {
@@ -45,7 +48,7 @@ export const LESSON_5: Lesson = {
     {
       id: 'l5_step2',
       title: 'Bước 2: Thử màu và Xác nhận độ đậm nhạt (Color Test)',
-      purpose: 'Mục đích: Cho khách xem thử màu thực tế trên móng để đảm bảo khách hài lòng với tông màu trước khi sơn toàn bộ',
+      purpose: 'Mục đích: Cho khách xem thử màu thực tế trên móng để đảm bảo khách hài lòng with tông màu trước khi sơn toàn bộ',
       lines: [
         {
           id: 'l5_s2_tech',
@@ -100,7 +103,8 @@ export const LESSON_5: Lesson = {
     { id: 'l5_v8', word: 'Wipe off', translation: 'Lau sạch', ipa: '/waɪp ɒf/' }
   ],
 
-  grammarPoints: [
+  // Fix: Rename grammarPoints to grammar_points
+  grammar_points: [
     {
       id: 'l5_g1',
       title: 'Mệnh lệnh lịch sự',
@@ -119,12 +123,14 @@ export const LESSON_5: Lesson = {
     }
   ],
 
-  roleplayScenario: `Bạn là Hân đang trang trí móng cho Ms. Minh. 
+  // Fix: Group roleplay properties into a roleplay object
+  roleplay: {
+    ai_instructions: `Bạn là Hân đang trang trí móng cho Ms. Minh. 
   
 🎯 Nhiệm vụ:
 - Hướng dẫn khách hơ đèn (bao gồm hơ riêng ngón cái).
 - Trấn an khách về độ nóng của đèn.
 - Thử màu và thực hiện trang trí French tips.`,
-
-  roleplayPrompt: `You are Ms. Minh. Behavior: Picky about color shade, worried about LED heat, loves charms.`
+    user_instructions: `You are Ms. Minh. Behavior: Picky about color shade, worried about LED heat, loves charms.`
+  }
 };

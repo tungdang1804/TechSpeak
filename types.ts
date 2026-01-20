@@ -46,25 +46,22 @@ export interface GrammarPoint {
 
 export interface Lesson {
   id: string;
+  order: number;
   title: string;
   description: string;
   thumbnail: string;
-  order: number;
-  
-  // Context Information
-  contextBackground: string;
-  contextGoal: string;
-  contextCharacters: { name: string; role: string }[];
-
-  // Structured Content
+  context: {
+    background: string;
+    goal: string;
+    characters: { name: string; role: string }[];
+  };
   steps: LessonStep[];
-
-  // Vocabulary & Grammar
   vocabularies: Vocabulary[];
-  grammarPoints: GrammarPoint[];
-  
-  roleplayPrompt: string;
-  roleplayScenario: string;
+  grammar_points: GrammarPoint[];
+  roleplay: {
+    ai_instructions: string;
+    user_instructions: string;
+  };
 }
 
 export interface UserProgress {
@@ -81,8 +78,7 @@ export interface IPASound {
   examples: { word: string; meaning: string; ipa: string }[];
 }
 
-// Star Detective Types
-export type GameCategory = 'Shape' | 'Length' | 'Color' | 'Style' | 'Deco';
+export type GameCategory = 'Shape' | 'Length' | 'Color' | 'Style' | 'Deco' | 'Tools' | 'Payment';
 
 export interface GameChoice {
   id: string;
@@ -96,4 +92,40 @@ export interface GameRound {
   audioText: string;
   correctIds: string[];
   choices: GameChoice[];
+}
+
+export interface RoleplayChecklistItem {
+  task: string;
+  is_completed: boolean;
+}
+
+export interface RoleplayTurnResponse {
+  ai_response: string;
+  user_transcript: string;
+  score: number;
+  feedback: string;
+  satisfaction: number;
+  satisfaction_reason?: string;
+  is_finished: boolean;
+  task_checklist: RoleplayChecklistItem[];
+  completion_percentage: number;
+  error?: string;
+}
+
+export interface RoleplaySummary {
+  overall_evaluation: string;
+  strengths: string[];
+  improvements: { 
+    incorrect: string; 
+    correct: string; 
+    reason: string; 
+  }[];
+  professional_rating: number;
+  scores: {
+    content: number;
+    fluency: number;
+    pronunciation: number;
+    grammar: number;
+  };
+  total_turns: number;
 }

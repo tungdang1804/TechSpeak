@@ -1,9 +1,7 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Mic, Square, Play, RefreshCw, Volume2 } from 'lucide-react';
-import { playAudio, blobToBase64 } from '../utils/audioUtils';
-
-declare var Capacitor: any;
+import { playAudio } from '../utils/audioUtils';
 
 interface VoiceRecorderProps {
   targetText: string;
@@ -19,19 +17,6 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ targetText, onCompleted }
   const startRecording = async () => {
     setAudioUrl(null);
     
-    // Native Logic
-    if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()) {
-      try {
-        const { VoiceRecorder } = await import('https://cdn.jsdelivr.net/npm/@capacitor-community/voice-recorder/+esm' as any);
-        const result = await VoiceRecorder.startRecording();
-        setIsRecording(true);
-        return;
-      } catch (e) {
-        console.error("Native start failed", e);
-      }
-    }
-
-    // Web Fallback
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
@@ -47,6 +32,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ targetText, onCompleted }
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
         onCompleted();
+        stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start();
@@ -57,34 +43,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ targetText, onCompleted }
     }
   };
 
-  const stopRecording = async () => {
-    // Native Stop
-    if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform() && isRecording) {
-      try {
-        const { VoiceRecorder } = await import('https://cdn.jsdelivr.net/npm/@capacitor-community/voice-recorder/+esm' as any);
-        const result = await VoiceRecorder.stopRecording();
-        setIsRecording(false);
-        
-        const byteCharacters = atob(result.value.recordDataBase64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const audioBlob = new Blob([byteArray], { type: result.value.mimeType });
-        setAudioUrl(URL.createObjectURL(audioBlob));
-        onCompleted();
-        return;
-      } catch (e) {
-        console.error("Native stop failed", e);
-      }
-    }
-
-    // Web Stop
+  const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      mediaRecorderRef.current.stream.getTracks().forEach((track: any) => track.stop());
     }
   };
 

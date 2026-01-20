@@ -1,6 +1,10 @@
 
 {
   "lessons": [
-    "lessons/lesson1.json"
+    "lessons/lesson1.json",
+    "lessons/lesson2.json",
+    "lessons/lesson3.json",
+    "lessons/lesson4.json",
+    "lessons/lesson5.json"
   ]
 }

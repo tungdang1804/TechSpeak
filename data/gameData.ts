@@ -3,43 +3,50 @@ import { GameRound, GameChoice } from '../types';
 
 export const COMMON_CHOICES: GameChoice[] = [
   // Shape
-  { id: 'sh_almond', label: 'Almond', category: 'Shape', icon: '💅' },
-  { id: 'sh_coffin', label: 'Coffin', category: 'Shape', icon: '⚰️' },
-  { id: 'sh_square', label: 'Square', category: 'Shape', icon: '⬛' },
+  { id: 'sh_almond', label: 'Almond Shape', category: 'Shape', icon: '📐' },
+  { id: 'sh_coffin', label: 'Coffin Shape', category: 'Shape', icon: '📐' },
+  { id: 'sh_square', label: 'Square Shape', category: 'Shape', icon: '📐' },
+  { id: 'sh_round', label: 'Round Shape', category: 'Shape', icon: '📐' },
+  { id: 'sh_oval', label: 'Oval Shape', category: 'Shape', icon: '📐' },
   
-  // Color & Tone
-  { id: 'col_pink', label: 'Pink', category: 'Color', icon: '🩷' },
-  { id: 'col_nude', label: 'Nude', category: 'Color', icon: '🫱' },
-  { id: 'col_red', label: 'Red', category: 'Color', icon: '❤️' },
-  { id: 'col_glitter', label: 'Glitter', category: 'Color', icon: '✨' },
+  // Color
+  { id: 'col_pink', label: 'Pink Color', category: 'Color', icon: '🎨' },
+  { id: 'col_nude', label: 'Nude Color', category: 'Color', icon: '🎨' },
+  { id: 'col_red', label: 'Red Color', category: 'Color', icon: '🎨' },
+  { id: 'col_glitter', label: 'Glitter Effect', category: 'Color', icon: '🎨' },
+  { id: 'col_white', label: 'White Color', category: 'Color', icon: '🎨' },
   
   // Deco
-  { id: 'dec_charms', label: 'Charms', category: 'Deco', icon: '💎' },
-  { id: 'dec_french', label: 'French tips', category: 'Deco', icon: '🏳️' },
-  { id: 'dec_stones', label: 'Stones', icon: '💍', category: 'Deco' },
+  { id: 'dec_charms', label: 'Charms / Stones', category: 'Deco', icon: '✨' },
+  { id: 'dec_french', label: 'French Tips', category: 'Deco', icon: '✨' },
+  { id: 'dec_stones', label: 'Rhinestones', category: 'Deco', icon: '✨' },
+  { id: 'dec_art', label: 'Custom Nail Art', category: 'Deco', icon: '✨' },
 
-  // Booking / Time
+  // Booking / Time Slots (Updated Labels)
+  { id: 'tm_today', label: 'Today', category: 'Style', icon: '📅' },
   { id: 'tm_tomorrow', label: 'Tomorrow', category: 'Style', icon: '📅' },
-  { id: 'tm_2pm', label: '2:00 PM', category: 'Style', icon: '🕒' },
-  { id: 'tm_today', label: 'Today', category: 'Style', icon: '☀️' },
+  { id: 'tm_weekend', label: 'This Weekend', category: 'Style', icon: '📅' },
+  { id: 'tm_nextweek', label: 'Next Week (incl. Next Fri)', category: 'Style', icon: '📅' },
+  { id: 'tm_morning', label: 'Morning (9am-12pm)', category: 'Style', icon: '📅' },
+  { id: 'tm_afternoon', label: 'Afternoon (12pm-5pm)', category: 'Style', icon: '📅' },
+  { id: 'tm_evening', label: 'Evening (5pm-9pm)', category: 'Style', icon: '📅' },
 
-  // Peer Assistance / Tools
-  { id: 'tl_drill', label: 'Nail Drill', category: 'Style', icon: '⚙️' },
-  { id: 'tl_nipper', label: 'Nipper', category: 'Style', icon: '✂️' },
-  { id: 'tl_towel', label: 'Towel', category: 'Style', icon: '🧼' },
+  // Tools
+  { id: 'tl_drill', label: 'Nail Drill', category: 'Tools', icon: '⚙️' },
+  { id: 'tl_nipper', label: 'Cuticle Nipper', category: 'Tools', icon: '⚙️' },
+  { id: 'tl_towel', label: 'Clean Towel', category: 'Tools', icon: '⚙️' },
 
   // Payment
-  { id: 'pay_cash', label: 'Cash', category: 'Style', icon: '💵' },
-  { id: 'pay_card', label: 'Card', category: 'Style', icon: '💳' },
-  { id: 'pay_tip', label: 'Tip', category: 'Style', icon: '💰' }
+  { id: 'pay_cash', label: 'Cash Payment', category: 'Payment', icon: '💳' },
+  { id: 'pay_card', label: 'Credit Card', category: 'Payment', icon: '💳' },
+  { id: 'pay_tip', label: 'Extra Tip', category: 'Payment', icon: '💳' }
 ];
 
 export const STAR_DETECTIVE_ROUNDS: GameRound[] = [
-  // Mặc định sẽ dùng Gemini để generate, đây là fallback
   {
-    id: 'round_1',
-    audioText: "I want a long Coffin set, please.",
-    correctIds: ['sh_coffin'],
+    id: 'round_fallback',
+    audioText: "I'd like to book an appointment for tomorrow afternoon, please.",
+    correctIds: ['tm_tomorrow', 'tm_afternoon'],
     choices: COMMON_CHOICES
   }
 ];

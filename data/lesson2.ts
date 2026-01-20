@@ -8,12 +8,15 @@ export const LESSON_2: Lesson = {
   description: 'Đón khách, mời nước và tư vấn mẫu thiết kế (Cat-eye, 3D, extensions).',
   thumbnail: 'https://images.unsplash.com/photo-1604902396830-aca29e19b067?q=80&w=400&auto=format&fit=crop',
 
-  contextBackground: 'Khách hàng Ms. Minh trực tiếp ghé tiệm theo lịch hẹn đã đặt trước qua điện thoại. Không gian lúc này là tương tác trực tiếp, yêu cầu sự niềm nở và kỹ năng tư vấn thẩm mỹ chuyên sâu để hiện thực hóa ý tưởng của khách hàng.',
-  contextGoal: 'Chào đón khách, mời ngồi vào vị trí làm việc và thực hiện tư vấn thiết kế (màu sắc, hình dáng, kỹ thuật trang trí) giúp Ms. Minh chọn được bộ móng sang trọng, độc đáo cho sự kiện lớn sắp tới.',
-  contextCharacters: [
-    { name: 'Tiên', role: 'Nhân viên phụ trách tiếp đón, kiểm tra lịch hẹn và tư vấn thiết kế.' },
-    { name: 'Ms. Minh', role: 'Khách hàng đã có lịch hẹn, cần sự tư vấn chuyên nghiệp cho bộ móng dự sự kiện.' }
-  ],
+  // Fix: Group context properties into a context object
+  context: {
+    background: 'Khách hàng Ms. Minh trực tiếp ghé tiệm theo lịch hẹn đã đặt trước qua điện thoại. Không gian lúc này là tương tác trực tiếp, yêu cầu sự niềm nở và kỹ năng tư vấn thẩm mỹ chuyên sâu để hiện thực hóa ý tưởng của khách hàng.',
+    goal: 'Chào đón khách, mời ngồi vào vị trí làm việc và thực hiện tư vấn thiết kế (màu sắc, hình dáng, kỹ thuật trang trí) giúp Ms. Minh chọn được bộ móng sang trọng, độc đáo cho sự kiện lớn sắp tới.',
+    characters: [
+      { name: 'Tiên', role: 'Nhân viên phụ trách tiếp đón, kiểm tra lịch hẹn và tư vấn thiết kế.' },
+      { name: 'Ms. Minh', role: 'Khách hàng đã có lịch hẹn, cần sự tư vấn chuyên nghiệp cho bộ móng dự sự kiện.' }
+    ],
+  },
 
   steps: [
     {
@@ -34,7 +37,7 @@ export const LESSON_2: Lesson = {
           translation: 'Chào mừng chị Minh đến với Star Spa. Chỗ ngồi của chị đã sẵn sàng rồi ạ.',
           variations: [
             { id: 'l2_v1_1', text: 'Welcome to Star Spa, Ms. Minh. Your station is ready.', translation: 'Chào mừng chị Minh đến với Star Spa. Chỗ ngồi của chị đã sẵn sàng rồi ạ.' },
-            { id: 'l2_v1_2', text: 'Hello, Ms. Minh. Please wait in the waiting area for a few minutes. I will be right with you.', translation: 'Chào chị Minh. Vui lòng đợi ở khu vực chờ vài phút nhé. Tôi sẽ đến hỗ trợ chị ngay.' },
+            { id: 'l2_v1_2', text: 'Hello, Ms. Minh. Please wait in the middle of the waiting area for a few minutes. I will be right with you.', translation: 'Chào chị Minh. Vui lòng đợi ở khu vực chờ vài phút nhé. Tôi sẽ đến hỗ trợ chị ngay.' },
             { id: 'l2_v1_3', text: 'Hello, Ms. Minh. Your station is ready. Please come this way.', translation: 'Chào chị Minh. Chỗ của chị đã sẵn sàng. Mời chị đi lối này ạ.' }
           ]
         }
@@ -111,7 +114,8 @@ export const LESSON_2: Lesson = {
     { id: 'l2_voc7', word: 'Suits', translation: 'Phù hợp/Hợp với', ipa: '/suːts/' }
   ],
 
-  grammarPoints: [
+  // Fix: Rename grammarPoints to grammar_points
+  grammar_points: [
     {
       id: 'l2_g1',
       title: 'Đề nghị lịch sự',
@@ -138,12 +142,14 @@ export const LESSON_2: Lesson = {
     }
   ],
   
-  roleplayScenario: `Bạn là nhân viên Tiên đón tiếp Ms. Minh tại Star Spa. 
+  // Fix: Group roleplay properties into a roleplay object
+  roleplay: {
+    ai_instructions: `Bạn là nhân viên Tiên đón tiếp Ms. Minh tại Star Spa. 
   
 🎯 Nhiệm vụ:
 - Chào đón niềm nở, xác nhận lịch hẹn 2:30.
 - Tư vấn mẫu móng cho sự kiện lớn (Cat-eye hoặc 3D).
 - Xác nhận các kỹ thuật đi kèm (Extensions, French tips).`,
-
-  roleplayPrompt: `You are Ms. Minh. Behavior: You have an appointment at 2:30. You want something elegant for a wedding. You are interested in a unique 3D powder art design.`
+    user_instructions: `You are Ms. Minh. Behavior: You have an appointment at 2:30. You want something elegant for a wedding. You are interested in a unique 3D powder art design.`
+  }
 };

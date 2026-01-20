@@ -8,13 +8,16 @@ export const LESSON_3: Lesson = {
   description: 'Vệ sinh da, xử lý móng khóe và hướng dẫn thực tế cho học viên (Star Spa).',
   thumbnail: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop',
 
-  contextBackground: 'Tình huống diễn ra tại khu vực làm việc của Star Spa. Kỹ thuật viên Hân vừa thực hiện các bước vệ sinh móng cho Ms. Minh, vừa giảng dạy thực tế cho học viên Mi về cách sử dụng dụng cụ và xử lý các vấn đề chuyên sâu như móng khóe.',
-  contextGoal: 'Thực hiện quy trình làm sạch da chuyên nghiệp, sử dụng máy mài móng an toàn và xử lý móng khóe (ingrown nail) một cách nhẹ nhàng. Đồng thời, giải thích cho học viên và khách hàng về lợi ích của việc chuẩn bị móng sạch sẽ.',
-  contextCharacters: [
-    { name: 'Hân', role: 'Kỹ thuật viên chính và hướng dẫn kỹ thuật.' },
-    { name: 'Mi', role: 'Học viên quan sát, hỗ trợ dụng cụ.' },
-    { name: 'Ms. Minh', role: 'Khách hàng đang gặp vấn đề đau nhức do móng khóe ở chân.' }
-  ],
+  // Fix: Group context properties into a context object
+  context: {
+    background: 'Tình huống diễn ra tại khu vực làm việc của Star Spa. Kỹ thuật viên Hân vừa thực hiện các bước vệ sinh móng cho Ms. Minh, vừa giảng dạy thực tế cho học viên Mi về cách sử dụng dụng cụ và xử lý các vấn đề chuyên sâu như móng khóe.',
+    goal: 'Thực hiện quy trình làm sạch da chuyên nghiệp, sử dụng máy mài móng an toàn và xử lý móng khóe (ingrown nail) một cách nhẹ nhàng. Đồng thời, giải thích cho học viên và khách hàng về lợi ích của việc chuẩn bị móng sạch sẽ.',
+    characters: [
+      { name: 'Hân', role: 'Kỹ thuật viên chính và hướng dẫn kỹ thuật.' },
+      { name: 'Mi', role: 'Học viên quan sát, hỗ trợ dụng cụ.' },
+      { name: 'Ms. Minh', role: 'Khách hàng đang gặp vấn đề đau nhức do móng khóe ở chân.' }
+    ],
+  },
 
   steps: [
     {
@@ -126,7 +129,8 @@ export const LESSON_3: Lesson = {
     { id: 'l3_voc9', word: 'Calluses', translation: 'Vết chai chân', ipa: '/ˈkæləsɪz/' }
   ],
 
-  grammarPoints: [
+  // Fix: Rename grammarPoints to grammar_points
+  grammar_points: [
     {
       id: 'l3_g1',
       title: 'Câu sai khiến/nhờ vả',
@@ -153,12 +157,14 @@ export const LESSON_3: Lesson = {
     }
   ],
   
-  roleplayScenario: `Bạn là Hân đang xử lý móng khóe cho Ms. Minh tại Star Spa. 
+  // Fix: Group roleplay properties into a roleplay object
+  roleplay: {
+    ai_instructions: `Bạn là Hân đang xử lý móng khóe cho Ms. Minh tại Star Spa. 
   
 🎯 Nhiệm vụ:
 - Hướng dẫn học viên Mi chuẩn bị dụng cụ.
 - Trấn an khách hàng khi xử lý khóe sâu.
 - Giải thích lợi ích của việc làm da sạch đối với độ bền của gel.`,
-
-  roleplayPrompt: `You are Ms. Minh. Behavior: You have a very painful ingrown nail on your big toe. You are nervous and keep asking the technician to be gentle. You also like the water temperature.`
+    user_instructions: `You are Ms. Minh. Behavior: You have a very painful ingrown nail on your big toe. You are nervous and keep asking the technician to be gentle. You also like the water temperature.`
+  }
 };

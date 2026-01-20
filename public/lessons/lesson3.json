@@ -1,0 +1,57 @@
+
+{
+  "id": "lesson_3",
+  "order": 3,
+  "title": "Cuticle Care & Treatment",
+  "description": "Vệ sinh da, xử lý móng khóe và hướng dẫn thực tế cho học viên (Star Spa).",
+  "thumbnail": "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
+  "context": {
+    "background": "Tình huống diễn ra tại khu vực làm việc của Star Spa. Kỹ thuật viên Hân vừa thực hiện các bước vệ sinh móng cho Ms. Minh, vừa giảng dạy thực tế cho học viên Mi về cách sử dụng dụng cụ và xử lý các vấn đề chuyên sâu như móng khóe.",
+    "goal": "Thực hiện quy trình làm sạch da chuyên nghiệp, sử dụng máy mài móng an toàn và xử lý móng khóe (ingrown nail) một cách nhẹ nhàng. Đồng thời, giải thích cho học viên và khách hàng về lợi ích của việc chuẩn bị móng sạch sẽ.",
+    "characters": [
+      { "name": "Hân", "role": "Kỹ thuật viên chính và hướng dẫn kỹ thuật." },
+      { "name": "Mi", "role": "Học viên quan sát, hỗ trợ dụng cụ." },
+      { "name": "Ms. Minh", "role": "Khách hàng đang gặp vấn đề đau nhức do móng khóe ở chân." }
+    ]
+  },
+  "steps": [
+    {
+      "id": "l3_step1",
+      "title": "Bước 1: Chuẩn bị và Giới thiệu Dụng cụ",
+      "purpose": "Mục đích: Đảm bảo đầy đủ dụng cụ cần thiết và khẳng định tiêu chuẩn vệ sinh an toàn tại Star Spa",
+      "lines": [
+        {
+          "id": "l3_s1_tech",
+          "speaker": "Tech",
+          "text": "Mi, please get the tool kit. We need cuticle nippers, a pusher, and the nail drill.",
+          "translation": "Mi ơi, lấy dùm chị bộ dụng cụ. Mình cần kiềm cắt da, cây đẩy da và máy mài móng.",
+          "variations": [
+            { "id": "l3_v1_1", "text": "Mi, please get the tool kit. We need cuticle nippers, a pusher, and the nail drill.", "translation": "Mi ơi, lấy dùm chị bộ dụng cụ. Mình cần kiềm cắt da, cây đẩy da và máy mài móng." }
+          ]
+        },
+        {
+          "id": "l3_s1_stu",
+          "speaker": "Student",
+          "text": "Yes, I have the cuticle nippers and the sanding bands for the drill here.",
+          "translation": "Dạ, em có kiềm và đầu nhám cho máy mài ở đây rồi ạ."
+        }
+      ]
+    }
+  ],
+  "vocabularies": [
+    { "id": "l3_voc1", "word": "Cuticle nippers", "translation": "Kiềm cắt da", "ipa": "/ˈkjuːtɪkl ˈnɪpərz/" },
+    { "id": "l3_voc5", "word": "Ingrown nail", "translation": "Móng khóe", "ipa": "/ˌɪnɡrəʊn ˈneɪl/" }
+  ],
+  "grammar_points": [
+    {
+      "id": "l3_g1",
+      "title": "Câu sai khiến/nhờ vả",
+      "description": "Dùng 'Please + [Động từ]' để hướng dẫn hoặc nhờ vả lịch sự.",
+      "examples": [{ "english": "Please soak your feet in the basin.", "vietnamese": "Vui lòng ngâm chân trong bồn ạ." }]
+    }
+  ],
+  "roleplay": {
+    "ai_instructions": "Bạn là Hân đang xử lý móng khóe cho Ms. Minh tại Star Spa. Hãy hướng dẫn học viên Mi chuẩn bị dụng cụ và trấn an khách hàng.",
+    "user_instructions": "You are Ms. Minh. You have a very painful ingrown nail and you are nervous."
+  }
+}

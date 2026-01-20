@@ -1,0 +1,54 @@
+
+{
+  "id": "lesson_5",
+  "order": 5,
+  "title": "Nail Art & Finishing",
+  "description": "Nghệ thuật sơn gel, vẽ trang trí (French tips, charms) và phủ bóng hoàn thiện.",
+  "thumbnail": "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
+  "context": {
+    "background": "Móng đã có form chuẩn. Hân bắt đầu quy trình sơn gel và trang trí nghệ thuật.",
+    "goal": "Điều hướng khách hơ đèn, thực hiện thử màu và xác nhận trang trí.",
+    "characters": [
+      { "name": "Hân", "role": "Kỹ thuật viên trang trí móng." },
+      { "name": "Ms. Minh", "role": "Khách hàng chọn màu." },
+      { "name": "Mi", "role": "Học viên quan sát." }
+    ]
+  },
+  "steps": [
+    {
+      "id": "l5_step1",
+      "title": "Bước 1: Hơ đèn",
+      "purpose": "Hướng dẫn khách thao tác với máy hơ",
+      "lines": [
+        {
+          "id": "l5_s1_tech",
+          "speaker": "Tech",
+          "text": "Please put your hand in the lamp for 60 seconds.",
+          "translation": "Vui lòng đặt tay chị vào đèn trong 60 giây."
+        },
+        {
+          "id": "l5_s1_cust",
+          "speaker": "Customer",
+          "text": "Is the light too hot?",
+          "translation": "Đèn có nóng quá không?"
+        }
+      ]
+    }
+  ],
+  "vocabularies": [
+    { "id": "l5_v3", "word": "Shade", "translation": "Tông màu", "ipa": "/ʃeɪd/" },
+    { "id": "l5_v6", "word": "Charms", "translation": "Phụ kiện", "ipa": "/tʃɑːmz/" }
+  ],
+  "grammar_points": [
+    {
+      "id": "l5_g1",
+      "title": "Mệnh lệnh lịch sự",
+      "description": "Dùng 'Please + [Verb]' để hướng dẫn khách.",
+      "examples": [{ "english": "Please put your hand in the lamp.", "vietnamese": "Vui lòng đặt tay vào đèn ạ." }]
+    }
+  ],
+  "roleplay": {
+    "ai_instructions": "Bạn là Hân đang trang trí móng. Hãy thử màu và thực hiện French tips.",
+    "user_instructions": "You are Ms. Minh. You are picky about color shades and worried about heat."
+  }
+}

@@ -1,58 +1,31 @@
 
 import { GoogleGenAI, Chat, Type } from "@google/genai";
-import { GameRound, GameChoice } from "../types";
+import { GameRound, GameChoice, RoleplayTurnResponse, RoleplaySummary } from "../types";
+import { getUsageStatus, recordUsage } from "./usageService";
+import { auth } from "./firebase";
+import { ADMIN_UID } from "./userService";
 
-// Define the response shape for roleplay turns
-export interface RoleplayTurnResponse {
-  ai_response: string;
-  user_transcript: string;
-  score: number;
-  feedback: string;
-  satisfaction: number;
-  is_finished: boolean;
-}
-
-export interface RoleplaySummary {
-  overall_evaluation: string;
-  strengths: string[];
-  improvements: { word: string; reason: string }[];
-  professional_rating: number;
-}
-
-// Helper to create AI client using process.env.API_KEY directly
 const createAIClient = () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+  return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
 export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRound[]> => {
-  const ai = createAIClient();
+  const uid = auth.currentUser?.uid;
+  const usage = await getUsageStatus(uid);
+  if (usage.isExceeded) return [];
 
-  const choicesContext = choices.map(c => `[ID: ${c.id}, Category: ${c.category}, Label: ${c.label}]`).join(', ');
+  const ai = createAIClient();
+  const bookingChoices = choices.filter(c => 
+    c.category === 'Style' || c.category === 'Payment' || 
+    ['Pedicure', 'Manicure', 'Full set'].some(s => c.label.includes(s))
+  );
+
+  const choicesContext = bookingChoices.map(c => `{id: "${c.id}", label: "${c.label}"}`).join(', ');
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `
-        You are an AI creating English listening challenges for a Nail Salon app.
-        Generate 5 rounds. Each round must belong to ONE of these categories:
-        - BOOKING (Time, people)
-        - TECHNICAL (Shape, style, tools)
-        - ASSISTANCE (Helping coworkers)
-        - PAYMENT (Price, tip, method)
-        
-        CRITICAL RULES:
-        1. The 'correctIds' MUST match the KEYWORDS mentioned in the 'audioText'. 
-        2. If the customer says "Not today, maybe tomorrow", only 'tomorrow' is a correct ID.
-        3. Use ONLY IDs provided in this list: ${choicesContext}.
-        
-        Return a JSON ARRAY of 5 objects:
-        {
-          "id": "round_index",
-          "category": "The category name",
-          "audioText": "A natural, realistic English sentence",
-          "correctIds": ["list", "of", "matching", "ids"]
-        }
-      `,
+      contents: `Generate 5 Nail Salon Booking challenges. Choices: [${choicesContext}].`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -61,42 +34,34 @@ export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRou
             type: Type.OBJECT,
             properties: {
               id: { type: Type.STRING },
-              category: { type: Type.STRING },
               audioText: { type: Type.STRING },
               correctIds: { type: Type.ARRAY, items: { type: Type.STRING } }
             },
-            required: ["id", "category", "audioText", "correctIds"]
+            required: ["id", "audioText", "correctIds"]
           }
         }
       }
     });
-
-    const generated = JSON.parse(response.text || '[]');
-    return generated.map((g: any) => ({
-      ...g,
-      choices: choices 
-    }));
+    recordUsage(uid);
+    return JSON.parse(response.text || '[]');
   } catch (error) {
-    console.error("Game Generation Error:", error);
     return [];
   }
 };
 
-export interface PronunciationResult {
-  score: number;
-  feedback: string;
-}
+export const assessPronunciation = async (audioBase64: string, targetText: string, mimeType: string = 'audio/webm') => {
+  const uid = auth.currentUser?.uid;
+  const usage = await getUsageStatus(uid);
+  if (usage.isExceeded) return { score: 0, feedback: "Hết lượt dùng AI hôm nay.", error: 'LIMIT_EXCEEDED' };
 
-export const assessPronunciation = async (audioBase64: string, targetText: string, mimeType: string = 'audio/webm'): Promise<PronunciationResult> => {
   const ai = createAIClient();
-  const effectiveMimeType = mimeType && mimeType.trim() !== '' ? mimeType : 'audio/webm';
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
         parts: [
-          { inlineData: { mimeType: effectiveMimeType, data: audioBase64 } },
-          { text: `Evaluate the pronunciation of "${targetText}". Return JSON: {score: 0-100, feedback: "Vietnamese feedback"}` }
+          { inlineData: { mimeType, data: audioBase64 } },
+          { text: `Evaluate pronunciation of "${targetText}". Return JSON {score: 0-100, feedback: "Vietnamese"}` }
         ]
       },
       config: {
@@ -108,73 +73,105 @@ export const assessPronunciation = async (audioBase64: string, targetText: strin
         }
       }
     });
-    return JSON.parse(response.text || '{"score": 0, "feedback": "No response"}') as PronunciationResult;
-  } catch (error) {
-    console.error("Pronunciation Check Error:", error);
+    recordUsage(uid);
+    return JSON.parse(response.text || '{"score": 0, "feedback": "Error"}');
+  } catch (error: any) {
+    const isRateLimit = error?.message?.includes('429') || error?.status === 429;
+    if (isRateLimit) return { score: 0, feedback: "Hệ thống Google đang quá tải (429). Thử lại sau 15 giây.", error: 'API_OVERLOAD' };
     return { score: 0, feedback: "Lỗi kết nối AI." };
   }
 };
 
-export const createRoleplaySession = (context: string) => {
+export const createRoleplaySession = (context: string, level: number = 1) => {
   const ai = createAIClient();
-  const systemInstruction = `You are a character in a Technical Workplace setting. Context: ${context}. Interaction Rules: 1. Communicate naturally. 2. Evaluate user's technical accuracy, politeness, and clarity. 3. Include a "satisfaction" score (0-100). 4. Feedback must be in Vietnamese. 5. Occasionally introduce "random variables" to test flexibility. If the session goal is met, set is_finished to true.`;
+  const systemInstruction = `You are a professional customer at a Nail Salon. Context: ${context}.
+  Difficulty: Level ${level}. 
+  SATISFACTION RULES:
+  - Start at 60%. Be strict.
+  - If user grammar is bad, decrease 10%.
+  - If user is professional, increase 5%.
+  satisfaction_reason MUST be in Vietnamese.
+  Return JSON only.`;
+  
   return ai.chats.create({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3-pro-preview',
     config: {
-      systemInstruction: systemInstruction,
-      temperature: 0.7,
+      systemInstruction,
+      temperature: 0.8,
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
-        properties: { ai_response: { type: Type.STRING }, user_transcript: { type: Type.STRING }, score: { type: Type.INTEGER }, feedback: { type: Type.STRING }, satisfaction: { type: Type.INTEGER }, is_finished: { type: Type.BOOLEAN } },
-        required: ["ai_response", "user_transcript", "score", "feedback", "satisfaction", "is_finished"]
+        properties: { 
+          ai_response: { type: Type.STRING }, 
+          user_transcript: { type: Type.STRING }, 
+          score: { type: Type.INTEGER }, 
+          feedback: { type: Type.STRING }, 
+          satisfaction: { type: Type.INTEGER }, 
+          satisfaction_reason: { type: Type.STRING },
+          is_finished: { type: Type.BOOLEAN },
+          completion_percentage: { type: Type.INTEGER },
+          task_checklist: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: { task: { type: Type.STRING }, is_completed: { type: Type.BOOLEAN } },
+              required: ["task", "is_completed"]
+            }
+          }
+        },
+        required: ["ai_response", "user_transcript", "score", "feedback", "satisfaction", "satisfaction_reason", "is_finished", "task_checklist", "completion_percentage"]
       }
     },
   });
 };
 
 export const sendRoleplayMessage = async (chat: Chat, audioBase64: string | null, textInput: string | null, mimeType: string = 'audio/webm'): Promise<RoleplayTurnResponse> => {
+  const uid = auth.currentUser?.uid;
+  const usage = await getUsageStatus(uid);
+  
+  // Nếu là Admin thì bỏ qua chặn
+  if (usage.isExceeded && uid !== ADMIN_UID) {
+    return { ai_response: "Đã hết lượt thử thách hôm nay!", user_transcript: "", score: 0, feedback: "", satisfaction: 50, is_finished: true, task_checklist: [], completion_percentage: 0, error: 'LIMIT_EXCEEDED' };
+  }
+
   try {
     const parts: any[] = [];
-    const effectiveMimeType = mimeType && mimeType.trim() !== '' ? mimeType : 'audio/webm';
-    if (audioBase64) parts.push({ inlineData: { mimeType: effectiveMimeType, data: audioBase64 } });
+    if (audioBase64) parts.push({ inlineData: { mimeType, data: audioBase64 } });
     if (textInput) parts.push({ text: textInput });
-    if (parts.length === 0) parts.push({ text: "Start roleplay." });
+    
     const result = await chat.sendMessage({ message: parts });
-    return JSON.parse(result.text || '{}') as RoleplayTurnResponse;
-  } catch (error) {
-    console.error("Roleplay API Error:", error);
-    return { ai_response: "Lỗi kết nối.", user_transcript: "", score: 0, feedback: "Lỗi AI.", satisfaction: 50, is_finished: false };
+    recordUsage(uid);
+    return JSON.parse(result.text || '{}');
+  } catch (error: any) {
+    const isRateLimit = error?.message?.includes('429') || error?.status === 429;
+    if (isRateLimit) return { ai_response: "API Google (Pro) đang đạt giới hạn tốc độ. Vui lòng đợi 20 giây.", user_transcript: "", score: 0, feedback: "API Rate Limit", satisfaction: 50, is_finished: false, task_checklist: [], completion_percentage: 0, error: 'API_OVERLOAD' };
+    return { ai_response: "Lỗi kết nối AI.", user_transcript: "", score: 0, feedback: "", satisfaction: 50, is_finished: false, task_checklist: [], completion_percentage: 0 };
   }
 };
 
 export const analyzeConversationHistory = async (history: { role: string; text: string }[]): Promise<RoleplaySummary> => {
+  const uid = auth.currentUser?.uid;
   const ai = createAIClient();
   const conversationText = history.map(h => `${h.role}: ${h.text}`).join('\n');
   
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: `
-        Analyze this Technical English Roleplay session for a Nail Salon staff.
-        Conversation history:
-        ${conversationText}
-
-        Evaluation Rules:
-        1. Evaluate based on Professionalism, Politeness, and Technical Accuracy.
-        2. Identify 3 specific English words or phrases the user struggled with or could improve.
-        3. All feedback must be in Vietnamese.
-
-        Return JSON in this format:
-        {
-          "overall_evaluation": "Summary of the whole session",
-          "strengths": ["list", "of", "strengths"],
-          "improvements": [
-            {"word": "word or phrase", "reason": "why they need to improve it"}
-          ],
-          "professional_rating": 0-100
-        }
-      `,
+      model: 'gemini-3-pro-preview',
+      contents: `Analyze this roleplay. 
+      CRITICAL SCORING RULES:
+      1. Use 100-point scale ONLY.
+      2. scores.content: 0-40
+      3. scores.fluency: 0-30
+      4. scores.pronunciation: 0-20
+      5. scores.grammar: 0-10
+      Total must be the SUM of above.
+      
+      IMPROVEMENTS:
+      - "incorrect": Exactly what user said wrong.
+      - "correct": The proper professional version.
+      
+      Conversation:
+      ${conversationText}`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -186,28 +183,31 @@ export const analyzeConversationHistory = async (history: { role: string; text: 
               type: Type.ARRAY,
               items: {
                 type: Type.OBJECT,
-                properties: {
-                  word: { type: Type.STRING },
-                  reason: { type: Type.STRING }
-                },
-                required: ["word", "reason"]
+                properties: { incorrect: { type: Type.STRING }, correct: { type: Type.STRING }, reason: { type: Type.STRING } },
+                required: ["incorrect", "correct", "reason"]
               }
             },
-            professional_rating: { type: Type.INTEGER }
+            scores: {
+              type: Type.OBJECT,
+              properties: {
+                content: { type: Type.INTEGER },
+                fluency: { type: Type.INTEGER },
+                pronunciation: { type: Type.INTEGER },
+                grammar: { type: Type.INTEGER }
+              },
+              required: ["content", "fluency", "pronunciation", "grammar"]
+            }
           },
-          required: ["overall_evaluation", "strengths", "improvements", "professional_rating"]
+          required: ["overall_evaluation", "strengths", "improvements", "scores"]
         }
       }
     });
-
-    return JSON.parse(response.text || '{}') as RoleplaySummary;
+    
+    const data = JSON.parse(response.text || '{}');
+    const total = data.scores.content + data.scores.fluency + data.scores.pronunciation + data.scores.grammar;
+    recordUsage(uid);
+    return { ...data, professional_rating: total, total_turns: history.length / 2 };
   } catch (error) {
-    console.error("Analysis Error:", error);
-    return {
-      overall_evaluation: "Không thể phân tích dữ liệu lúc này.",
-      strengths: [],
-      improvements: [],
-      professional_rating: 0
-    };
+    throw error;
   }
 };

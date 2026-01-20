@@ -8,13 +8,16 @@ export const LESSON_4: Lesson = {
   description: 'Kỹ thuật dũa nhám, gắn móng tip, đắp gel và tạo dáng móng (Almond, Square, Coffin).',
   thumbnail: 'https://images.unsplash.com/photo-1604902396830-aca29e19b067?q=80&w=400&auto=format&fit=crop',
   
-  contextBackground: 'Sau khi làm sạch da ở Bài 3, Hân bắt đầu xử lý bề mặt móng để chuẩn bị gắn móng giả. Đây là giai đoạn kỹ thuật then chốt tại Star Spa để đảm bảo độ bền (không bị bong tróc) và tạo ra hình dáng móng (form) hoàn hảo theo ý khách.',
-  contextGoal: 'Thực hiện quy trình chuẩn bị bề mặt (buff móng, chống kiềm), tư vấn và thực hiện các kỹ thuật nối móng (Tips, Acrylic, Gel Extensions), đồng thời kiểm tra độ cân đối giữa hai bàn tay trước khi sơn màu.',
-  contextCharacters: [
-    { name: 'Hân', role: 'Kỹ thuật viên thực hiện kỹ thuật chính.' },
-    { name: 'Mi', role: 'Học viên quan sát và hỗ trợ kiểm tra độ cân đối.' },
-    { name: 'Ms. Minh', role: 'Khách hàng tham gia chọn dáng móng và độ dài.' }
-  ],
+  // Fix: Group context properties into a context object
+  context: {
+    background: 'Sau khi làm sạch da ở Bài 3, Hân bắt đầu xử lý bề mặt móng để chuẩn bị gắn móng giả. Đây là giai đoạn kỹ thuật then chốt tại Star Spa để đảm bảo độ bền (không bị bong tróc) và tạo ra hình dáng móng (form) hoàn hảo theo ý khách.',
+    goal: 'Thực hiện quy trình chuẩn bị bề mặt (buff móng, chống kiềm), tư vấn và thực hiện các kỹ thuật nối móng (Tips, Acrylic, Gel Extensions), đồng thời kiểm tra độ cân đối giữa hai bàn tay trước khi sơn màu.',
+    characters: [
+      { name: 'Hân', role: 'Kỹ thuật viên thực hiện kỹ thuật chính.' },
+      { name: 'Mi', role: 'Học viên quan sát và hỗ trợ kiểm tra độ cân đối.' },
+      { name: 'Ms. Minh', role: 'Khách hàng tham gia chọn dáng móng và độ dài.' }
+    ],
+  },
 
   steps: [
     {
@@ -98,7 +101,8 @@ export const LESSON_4: Lesson = {
     { id: 'l4_v8', word: 'Aligned', translation: 'Thẳng hàng/Đều nhau', ipa: '/əˈlaɪnd/' }
   ],
 
-  grammarPoints: [
+  // Fix: Rename grammarPoints to grammar_points
+  grammar_points: [
     {
       id: 'l4_g1',
       title: 'Cấu trúc mục đích',
@@ -125,12 +129,14 @@ export const LESSON_4: Lesson = {
     }
   ],
   
-  roleplayScenario: `Bạn là Hân đang tạo form móng cho Ms. Minh tại Star Spa. 
+  // Fix: Group roleplay properties into a roleplay object
+  roleplay: {
+    ai_instructions: `Bạn là Hân đang tạo form móng cho Ms. Minh tại Star Spa. 
   
 🎯 Nhiệm vụ:
 - Giải thích việc dũa nhám và đeo găng tay UV.
 - Tư vấn dáng Almond cho sự kiện.
 - Kiểm tra độ thẳng và xác nhận độ dài với khách.`,
-
-  roleplayPrompt: `You are Ms. Minh. Behavior: You want a specific length (medium). You are curious about why you need to wear gloves. You want to make sure your nails are not crooked (straight).`
+    user_instructions: `You are Ms. Minh. Behavior: You want a specific length (medium). You are curious about why you need to wear gloves. You want to make sure your nails are not crooked (straight).`
+  }
 };
