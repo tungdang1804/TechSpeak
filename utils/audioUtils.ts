@@ -12,6 +12,10 @@ export const VOICE_MODELS = {
 let currentGender: VoiceGender = (localStorage.getItem('voiceGender') as VoiceGender) || 'female';
 const audioBufferCache = new Map<string, AudioBuffer>();
 
+// Hàng đợi xử lý yêu cầu để tránh lỗi 429
+const requestQueue: (() => Promise<any>)[] = [];
+let isProcessingQueue = false;
+
 let activeAudioSource: AudioBufferSourceNode | null = null;
 let activeAudioContext: AudioContext | null = null;
 let currentPlayingKey: string | null = null;
@@ -56,22 +60,16 @@ export async function decodeAudioData(
   sampleRate: number = 24000,
   numChannels: number = 1,
 ): Promise<AudioBuffer> {
-  // Đảm bảo xử lý dữ liệu từ ArrayBuffer gốc một cách an toàn
-  const buffer = data.buffer;
-  const offset = data.byteOffset;
-  const length = data.byteLength;
-  
-  // Tạo view Int16 chính xác từ dữ liệu PCM raw
-  const bufferView = new Int16Array(buffer, offset, length / 2);
+  const bufferView = new Int16Array(data.buffer, data.byteOffset, data.byteLength / 2);
   const frameCount = bufferView.length / numChannels;
   const audioBuffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
 
   for (let channel = 0; channel < numChannels; channel++) {
     const channelData = audioBuffer.getChannelData(channel);
     for (let i = 0; i < frameCount; i++) {
-      // Chuyển đổi chính xác biên độ để tránh méo tiếng (distortion/rè)
+      // Chuyển đổi chuẩn xác từ Int16 sang Float32
       const val = bufferView[i * numChannels + channel];
-      channelData[i] = val < 0 ? val / 32768.0 : val / 32767.0;
+      channelData[i] = val / 32768.0;
     }
   }
   return audioBuffer;
@@ -98,36 +96,69 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-export const preloadAudio = async (text: string, context: SpeechContext = 'normal') => {
+// Hàm xử lý hàng đợi để tránh spam API
+const processQueue = async () => {
+  if (isProcessingQueue || requestQueue.length === 0) return;
+  isProcessingQueue = true;
+  
+  while (requestQueue.length > 0) {
+    const task = requestQueue.shift();
+    if (task) {
+      await task();
+      // Nghỉ 500ms giữa các lần gọi để tránh 429
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+  
+  isProcessingQueue = false;
+};
+
+export const preloadAudio = async (text: string, context: SpeechContext = 'normal', retryCount = 0) => {
   const voiceName = currentGender === 'female' ? VOICE_MODELS.female.voiceId : VOICE_MODELS.male.voiceId;
   const cacheKey = `${voiceName}_${text}_${context}`;
   
   if (audioBufferCache.has(cacheKey)) return;
 
-  const ctx = getAudioContext();
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = wrapSSML(text, context);
+  return new Promise((resolve) => {
+    requestQueue.push(async () => {
+      const ctx = getAudioContext();
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const prompt = wrapSSML(text, context);
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: prompt }] }],
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-          voiceConfig: { prebuiltVoiceConfig: { voiceName } },
-        },
-      },
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash-preview-tts",
+          contents: [{ parts: [{ text: prompt }] }],
+          config: {
+            responseModalities: [Modality.AUDIO],
+            speechConfig: {
+              voiceConfig: { prebuiltVoiceConfig: { voiceName } },
+            },
+          },
+        });
+
+        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        if (base64Audio) {
+          const audioBuffer = await decodeAudioData(decodeBase64(base64Audio), ctx);
+          audioBufferCache.set(cacheKey, audioBuffer);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (error: any) {
+        // Xử lý lỗi 429: Thử lại sau 2 giây
+        if ((error?.status === 429 || error?.message?.includes('429')) && retryCount < 3) {
+          console.warn(`429 detected for "${text}", retrying in 2s...`);
+          await new Promise(r => setTimeout(r, 2000));
+          await preloadAudio(text, context, retryCount + 1);
+        } else {
+          console.error("TTS failed for:", text, error);
+        }
+        resolve(false);
+      }
     });
-
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (base64Audio) {
-      const audioBuffer = await decodeAudioData(decodeBase64(base64Audio), ctx);
-      audioBufferCache.set(cacheKey, audioBuffer);
-    }
-  } catch (error) {
-    console.warn("TTS preload failed:", text);
-  }
+    processQueue();
+  });
 };
 
 export const playAudio = async (text: string, context: SpeechContext = 'normal') => {
@@ -161,6 +192,7 @@ export const playAudio = async (text: string, context: SpeechContext = 'normal')
     return playFromBuffer(audioBufferCache.get(cacheKey)!);
   }
 
+  // Load và phát ngay khi xong
   await preloadAudio(text, context);
   if (audioBufferCache.has(cacheKey)) {
     return playFromBuffer(audioBufferCache.get(cacheKey)!);
