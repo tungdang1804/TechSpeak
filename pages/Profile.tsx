@@ -1,4 +1,3 @@
-
 import React, { useState, Suspense, lazy } from 'react';
 import { UserProfile } from '../services/userService';
 import { 
@@ -8,14 +7,13 @@ import {
   Trash2, 
   ArrowRight, 
   Loader2,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { logout, loginWithEmail, upgradeAccount } from '../services/authService';
 import { auth } from '../services/firebase';
 import { playAudio } from '../utils/audioUtils';
 import StudyRoom from '../components/profile/StudyRoom';
-
-const AuthModule = lazy(() => import('../components/profile/AuthModule'));
 
 interface ProfileProps {
   userProfile: UserProfile;
@@ -23,6 +21,8 @@ interface ProfileProps {
   onGenderToggle: () => void;
   quotaInfo: { used: number, limit: number | string };
 }
+
+const AuthModule = lazy(() => import('../components/profile/AuthModule'));
 
 const Profile: React.FC<ProfileProps> = ({ userProfile, voiceGender, onGenderToggle, quotaInfo }) => {
   const isGuest = !auth.currentUser || auth.currentUser.isAnonymous;
@@ -90,6 +90,15 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, voiceGender, onGenderTog
           </div>
           <ArrowRight size={16} className="text-slate-300 group-hover:translate-x-1 transition-transform" />
         </button>
+      </div>
+
+      {/* Version Tag */}
+      <div className="mt-12 flex flex-col items-center gap-1 opacity-40">
+        <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <Info size={10} />
+          <span>TechSpeak Master v0.7 Beta</span>
+        </div>
+        <p className="text-[8px] font-bold text-slate-300">© 2024 Star Academy. All rights reserved.</p>
       </div>
     </div>
   );

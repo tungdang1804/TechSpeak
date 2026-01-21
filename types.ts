@@ -1,4 +1,6 @@
 
+// --- CORE DOMAIN TYPES ---
+
 export enum LessonStatus {
   LOCKED = 'LOCKED',
   UNLOCKED = 'UNLOCKED',
@@ -9,40 +11,31 @@ export interface Vocabulary {
   id: string;
   word: string;
   translation: string;
-  imageUrl?: string;
+  ipa: string;
   definition?: string;
-  ipa?: string;
+  imageUrl?: string;
   exampleSentence?: string;
-}
-
-export interface ScriptVariation {
-  id: string;
-  text: string;
-  translation: string;
-}
-
-export interface ScriptLine {
-  id: string;
-  speaker: 'Tech' | 'Customer' | 'Student';
-  text: string;
-  translation: string;
-  variations?: ScriptVariation[];
-}
-
-export interface LessonStep {
-  id: string;
-  title: string;
-  purpose: string;
-  lines: ScriptLine[];
 }
 
 export interface GrammarPoint {
   id: string;
   title: string;
   description: string;
-  structure?: string;
   examples: { english: string; vietnamese: string }[];
   isCollocation?: boolean;
+}
+
+export interface LessonStep {
+  id: string;
+  title: string;
+  purpose: string;
+  lines: {
+    id: string;
+    speaker: 'Tech' | 'Customer' | 'Student';
+    text: string;
+    translation: string;
+    variations?: { id: string; text: string; translation: string }[];
+  }[];
 }
 
 export interface Lesson {
@@ -51,7 +44,7 @@ export interface Lesson {
   title: string;
   description: string;
   thumbnail: string;
-  context: {
+  context?: {
     background: string;
     goal: string;
     characters: { name: string; role: string }[];
@@ -65,29 +58,17 @@ export interface Lesson {
   };
 }
 
-export interface UserProgress {
-  completedLessons: string[];
-  unlockedLessons: string[];
-  bestScores: Record<string, number>;
-}
+// --- GAME & CHALLENGE TYPES ---
 
-export interface IPASound {
-  symbol: string;
-  type: 'vowel' | 'diphthong' | 'consonant';
-  name?: string;
-  description: string;
-  examples: { word: string; meaning: string; ipa: string }[];
-}
-
-export type GameCategory = 'Shape' | 'Length' | 'Color' | 'Style' | 'Deco' | 'Tools' | 'Payment';
-
+// Fix: Added missing GameChoice interface
 export interface GameChoice {
   id: string;
   label: string;
-  category: GameCategory;
-  icon?: string;
+  category: string;
+  icon: string;
 }
 
+// Fix: Added missing GameRound interface
 export interface GameRound {
   id: string;
   audioText: string;
@@ -95,9 +76,65 @@ export interface GameRound {
   choices: GameChoice[];
 }
 
-export interface RoleplayChecklistItem {
-  task: string;
-  is_completed: boolean;
+// --- USER & PROGRESS DOMAIN ---
+
+export interface AvatarConfig {
+  gender: 'male' | 'female';
+  baseId: string;
+  items: string[];
+}
+
+export interface InventoryState {
+  ownedItems: string[];
+  equipped: {
+    desk?: string;
+    decor?: string;
+    pet?: string;
+    wallpaper?: string;
+  };
+}
+
+// Fix: Added missing SavedPattern interface for grammar library
+export interface SavedPattern {
+  id: string;
+  original: string;
+  corrected: string;
+  explanation: string;
+  timestamp: string;
+}
+
+export interface UserProfile {
+  uid: string;
+  displayName: string;
+  completedLessons: string[];
+  unlockedLessons: string[];
+  bestScores: Record<string, number>;
+  onboardingComplete: boolean;
+  primaryIndustry: 'nails' | 'bartender' | 'flooring' | 'mechanic';
+  avatarConfig: AvatarConfig;
+  lastDailyReset: string;
+  usageCount: number;
+  points: number;
+  starLevel: number;
+  unlockedIndustries: string[];
+  userVocabulary: string[];
+  userGrammar: SavedPattern[];
+  pointHistory: any[];
+  isAdmin: boolean;
+  inventory?: InventoryState;
+}
+
+// Fix: Added UserProgress alias for consistency across components
+export type UserProgress = UserProfile;
+
+// --- SPECIALIZED FEATURE TYPES ---
+
+export interface IPASound {
+  symbol: string;
+  type: 'vowel' | 'diphthong' | 'consonant';
+  name?: string;
+  description: string;
+  examples: { word: string; meaning: string; ipa: string }[];
 }
 
 export interface RoleplayTurnResponse {
@@ -108,25 +145,29 @@ export interface RoleplayTurnResponse {
   satisfaction: number;
   satisfaction_reason?: string;
   is_finished: boolean;
-  task_checklist: RoleplayChecklistItem[];
   completion_percentage: number;
+  task_checklist: { task: string; is_completed: boolean }[];
   error?: string;
 }
 
 export interface RoleplaySummary {
+  professional_rating: number;
+  total_turns: number;
   overall_evaluation: string;
   strengths: string[];
-  improvements: { 
-    incorrect: string; 
-    correct: string; 
-    reason: string; 
-  }[];
-  professional_rating: number;
+  improvements: { incorrect: string; correct: string; reason: string }[];
   scores: {
     content: number;
     fluency: number;
     pronunciation: number;
     grammar: number;
   };
-  total_turns: number;
+}
+
+export interface Industry {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  status: 'available' | 'coming_soon';
 }

@@ -1,0 +1,48 @@
+
+{
+  "id": "nails_l3",
+  "order": 3,
+  "title": "Cuticle Care & Treatment",
+  "description": "Vệ sinh da, xử lý móng khóe và hướng dẫn thực tế.",
+  "thumbnail": "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
+  "context": {
+    "background": "Kỹ thuật viên Hân thực hiện vệ sinh móng cho khách và hướng dẫn học viên.",
+    "goal": "Làm sạch da chuyên nghiệp và xử lý móng khóe an toàn.",
+    "characters": [
+      { "name": "Hân", "role": "Kỹ thuật viên chính." },
+      { "name": "Mi", "role": "Học viên." },
+      { "name": "Ms. Minh", "role": "Khách hàng bị đau móng khóe." }
+    ]
+  },
+  "steps": [
+    {
+      "id": "nails_l3_s1",
+      "title": "Bước 1: Chuẩn bị dụng cụ",
+      "purpose": "Đảm bảo tiêu chuẩn vệ sinh",
+      "lines": [
+        {
+          "id": "nails_l3_s1_l1",
+          "speaker": "Tech",
+          "text": "Mi, please get the tool kit. We need cuticle nippers and the nail drill.",
+          "translation": "Mi ơi, lấy dùm chị bộ dụng cụ. Mình cần kiềm cắt da và máy mài móng."
+        }
+      ]
+    }
+  ],
+  "vocabularies": [
+    { "id": "v1", "word": "Safety", "translation": "An toàn", "ipa": "/ˈseɪfti/" },
+    { "id": "v2", "word": "Sterilizer", "translation": "Máy tiệt trùng", "ipa": "/ˈsterəlaɪzər/" }
+  ],
+  "grammar_points": [
+    {
+      "id": "g1",
+      "title": "Imperatives",
+      "description": "Dùng 'Please + Verb' để yêu cầu.",
+      "examples": [{ "english": "Please get the kit.", "vietnamese": "Làm ơn lấy bộ dụng cụ." }]
+    }
+  ],
+  "roleplay": {
+    "ai_instructions": "You are Ms. Minh. You have a painful ingrown nail. You are nervous about the nippers.",
+    "user_instructions": "Bạn là thợ Hân. Hãy trấn an khách và bắt đầu vệ sinh móng chuyên nghiệp."
+  }
+}

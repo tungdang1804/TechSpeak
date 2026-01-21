@@ -5,7 +5,7 @@ import { generateGameRounds } from '../../services/ai/gameService';
 import { COMMON_CHOICES } from '../../data/gameData';
 import { playAudio, stopAllAudio, preloadAudio } from '../../utils/audioUtils';
 
-export const useDetectiveLogic = (onBack: () => void) => {
+export const useDetectiveLogic = (industryId: string, onBack: () => void) => {
   const [rounds, setRounds] = useState<GameRound[]>([]);
   const [currentRoundIdx, setCurrentRoundIdx] = useState(0);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -27,7 +27,7 @@ export const useDetectiveLogic = (onBack: () => void) => {
       clearAllTimers();
       stopAllAudio();
     };
-  }, []);
+  }, [industryId]);
 
   const clearAllTimers = () => {
     if (autoPlayTimerRef.current) window.clearTimeout(autoPlayTimerRef.current);
@@ -36,11 +36,12 @@ export const useDetectiveLogic = (onBack: () => void) => {
 
   const initGame = async () => {
     setGameState('loading');
-    const interval = window.setInterval(() => setLoadingProgress(p => Math.min(p + 15, 90)), 200);
+    setLoadingProgress(10);
     
     try {
-      const newRounds = await generateGameRounds('Mixed');
+      const newRounds = await generateGameRounds(industryId, 'Mixed');
       if (newRounds.length > 0) {
+        setLoadingProgress(50);
         await Promise.all(newRounds.map(r => preloadAudio(r.audioText, 'normal')));
         setRounds(newRounds);
         setMaxScore(newRounds.length * 50);
@@ -51,14 +52,15 @@ export const useDetectiveLogic = (onBack: () => void) => {
       }
     } catch (e) {
       onBack();
-    } finally {
-      window.clearInterval(interval);
     }
   };
 
   const setupRound = (round: GameRound) => {
-    const correctOnes = COMMON_CHOICES.filter(c => round.correctIds.includes(c.id));
-    const distractors = COMMON_CHOICES.filter(c => !round.correctIds.includes(c.id)).sort(() => Math.random() - 0.5);
+    // Lọc lựa chọn theo ngành
+    const industryChoices = COMMON_CHOICES.filter(c => c.industry === industryId);
+    const correctOnes = industryChoices.filter(c => round.correctIds.includes(c.id));
+    const distractors = industryChoices.filter(c => !round.correctIds.includes(c.id)).sort(() => Math.random() - 0.5);
+    
     const result = [...correctOnes, ...distractors.slice(0, 12 - correctOnes.length)];
     setBasket(result.sort(() => Math.random() - 0.5));
     startAudioSequence(round.audioText);

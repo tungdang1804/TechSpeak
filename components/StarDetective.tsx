@@ -19,15 +19,16 @@ const SunnyMascot: FC<{ message: string, mood?: 'happy' | 'sad' | 'thinking' }> 
 );
 
 interface StarDetectiveProps {
+  industryId: string;
   onBack: () => void;
 }
 
-const StarDetective: FC<StarDetectiveProps> = ({ onBack }) => {
+const StarDetective: FC<StarDetectiveProps> = ({ industryId, onBack }) => {
   const {
     rounds, currentRoundIdx, selectedIds, gameState, roundScore,
     totalScore, maxScore, feedback, basket, countdown, loadingProgress,
     toggleChoice, handleConfirm, nextRound
-  } = useDetectiveLogic(onBack);
+  } = useDetectiveLogic(industryId, onBack);
 
   if (gameState === 'loading') return (
     <div className="h-full flex flex-col items-center justify-center p-10 bg-app-bg animate-fade-in">
@@ -49,7 +50,6 @@ const StarDetective: FC<StarDetectiveProps> = ({ onBack }) => {
 
   return (
     <div className="h-full flex flex-col bg-app-bg p-5 overflow-hidden">
-      {/* Header Info */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-1">
            {rounds.map((_, i) => (
@@ -61,7 +61,6 @@ const StarDetective: FC<StarDetectiveProps> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Main Controls */}
       <div className="flex items-center gap-4 mb-6">
         <button 
           onClick={() => currentRound && playAudio(currentRound.audioText, 'normal')} 

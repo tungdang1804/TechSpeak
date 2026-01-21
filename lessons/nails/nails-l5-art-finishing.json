@@ -1,0 +1,47 @@
+
+{
+  "id": "nails_l5",
+  "order": 5,
+  "title": "Nail Art & Finishing",
+  "description": "Nghệ thuật sơn gel, vẽ trang trí và phủ bóng.",
+  "thumbnail": "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
+  "context": {
+    "background": "Hân thực hiện công đoạn trang trí cuối cùng.",
+    "goal": "Xác nhận màu sơn và hướng dẫn hơ đèn.",
+    "characters": [
+      { "name": "Hân", "role": "Kỹ thuật viên." },
+      { "name": "Ms. Minh", "role": "Khách hàng." }
+    ]
+  },
+  "steps": [
+    {
+      "id": "nails_l5_s1",
+      "title": "Bước 1: Hơ đèn",
+      "purpose": "Đảm bảo gel khô hoàn toàn",
+      "lines": [
+        {
+          "id": "nails_l5_s1_l1",
+          "speaker": "Tech",
+          "text": "Please put your hand in the lamp for 60 seconds.",
+          "translation": "Vui lòng đặt tay chị vào đèn trong 60 giây."
+        }
+      ]
+    }
+  ],
+  "vocabularies": [
+    { "id": "v1", "word": "Shade", "translation": "Tông màu", "ipa": "/ʃeɪd/" },
+    { "id": "v2", "word": "Top coat", "translation": "Sơn bóng", "ipa": "/tɒp kəʊt/" }
+  ],
+  "grammar_points": [
+    {
+      "id": "g1",
+      "title": "Duration",
+      "description": "Dùng 'for + time' để chỉ khoảng thời gian.",
+      "examples": [{ "english": "Wait for 1 minute.", "vietnamese": "Đợi trong 1 phút." }]
+    }
+  ],
+  "roleplay": {
+    "ai_instructions": "You are Ms. Minh. You want two coats of red gel and worry if it's too hot in the lamp.",
+    "user_instructions": "Bạn là thợ Hân. Hãy hướng dẫn khách hơ đèn và kiểm tra độ bóng cuối cùng."
+  }
+}

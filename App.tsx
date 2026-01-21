@@ -2,7 +2,7 @@
 import React, { useEffect, Suspense, lazy, useMemo } from 'react';
 import { Lesson } from './types';
 import { getVoicePreference, setVoicePreference, VoiceGender, playAudio } from './utils/audioUtils';
-import { fetchLessonsFromManifest } from './services/dataService';
+import { fetchLessonsByIndustry } from './services/dataService';
 import { useUserProgress } from './hooks/useUserProgress';
 import { useAppNavigation } from './hooks/useAppNavigation';
 import { Home, BookOpen, Library as LibraryIcon, User as UserIcon, X, Trophy } from 'lucide-react';
@@ -34,8 +34,9 @@ function App() {
   const [voiceGender, setVoiceGender] = React.useState<VoiceGender>(getVoicePreference());
 
   useEffect(() => {
-    fetchLessonsFromManifest().then(setLessons);
-  }, []);
+    const industry = userProfile?.primaryIndustry || 'nails';
+    fetchLessonsByIndustry(industry).then(setLessons);
+  }, [userProfile?.primaryIndustry]);
 
   const handleGenderToggle = () => {
     const newGender = voiceGender === 'female' ? 'male' : 'female';
@@ -47,15 +48,8 @@ function App() {
   const isGuest = useMemo(() => !auth.currentUser || auth.currentUser.isAnonymous, [auth.currentUser]);
   const isLessonUnlocked = (lesson: Lesson) => (lesson.order <= 2 || userProfile?.isAdmin || userProfile?.unlockedLessons.includes(lesson.id));
 
-  const quotaInfo = useMemo(() => {
-    if (!userProfile) return { used: 0, limit: 50 };
-    const limit = isGuest ? 50 : (100 + (userProfile.starLevel * 20));
-    return { used: userProfile.usageCount || 0, limit: userProfile.isAdmin ? '∞' : limit };
-  }, [userProfile, isGuest]);
-
   if (isLoading || !userProfile) return <LoadingOverlay />;
 
-  // Trigger Onboarding if not complete
   if (!userProfile.onboardingComplete) {
     return <OnboardingWizard user={userProfile} />;
   }
@@ -80,7 +74,7 @@ function App() {
             )}
             {nav.activeTab === 'roadmap' && (
               <div className="p-6 h-full pb-32 animate-fade-in">
-                <div className="mb-8 px-2"><h2 className="text-2xl font-black text-app-text mb-1">Lộ trình Đào tạo</h2><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Star Artist Journey</p></div>
+                <div className="mb-8 px-2"><h2 className="text-2xl font-black text-app-text mb-1">Lộ trình Đào tạo</h2><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{userProfile.primaryIndustry.toUpperCase()} JOURNEY</p></div>
                 <div className="space-y-4">
                   {lessons.map(l => {
                     const unlocked = isLessonUnlocked(l);
@@ -95,7 +89,7 @@ function App() {
               </div>
             )}
             {nav.activeTab === 'practice' && <Library lessons={lessons} profile={userProfile} />}
-            {nav.activeTab === 'profile' && <Profile userProfile={userProfile} voiceGender={voiceGender} onGenderToggle={handleGenderToggle} quotaInfo={quotaInfo} />}
+            {nav.activeTab === 'profile' && <Profile userProfile={userProfile} voiceGender={voiceGender} onGenderToggle={handleGenderToggle} quotaInfo={{used: userProfile.usageCount, limit: isGuest ? 50 : 100}} />}
           </Suspense>
         </div>
       </div>
@@ -116,7 +110,7 @@ function App() {
             </div>
             <div className="flex-1 overflow-hidden">
                 {!nav.activeChallenge ? <DailyChallengeHub lessons={lessons} unlockedLessonIds={userProfile.unlockedLessons} onSelectChallenge={nav.startChallenge} onClose={nav.closeChallengeHub} />
-                : nav.activeChallenge === 'listening' ? <StarDetective onBack={() => nav.setActiveChallenge(null)} />
+                : nav.activeChallenge === 'listening' ? <StarDetective industryId={userProfile.primaryIndustry} onBack={() => nav.setActiveChallenge(null)} />
                 : nav.challengeScenario && <AIRoleplay scenarioContext={nav.challengeScenario.context} userScenario={nav.challengeScenario.user} multiplier={nav.challengeScenario.multiplier} />}
             </div>
           </div>

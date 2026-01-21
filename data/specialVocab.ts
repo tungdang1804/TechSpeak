@@ -8,6 +8,7 @@ export interface SpecialVocabItem {
 }
 
 export interface SpecialVocabGroup {
+  industry: string; // 'common' | 'nails' | 'bartender' | 'flooring' | 'mechanic'
   title: string;
   icon: string;
   subGroups: {
@@ -17,8 +18,34 @@ export interface SpecialVocabGroup {
 }
 
 export const SPECIALIZED_VOCAB: SpecialVocabGroup[] = [
+  // --- 0. DÙNG CHUNG (COMMON POOL) ---
   {
-    title: "1. HÌNH DÁNG MÓNG (NAIL SHAPES)",
+    industry: 'common',
+    title: "GIAO TIẾP CƠ BẢN",
+    icon: "💬",
+    subGroups: [
+      {
+        name: "Chào hỏi & Tiếp đón",
+        items: [
+          { id: 'com_1', text: 'How can I help you?', sub: 'Tôi có thể giúp gì cho bạn?' },
+          { id: 'com_2', text: 'Welcome to our shop', sub: 'Chào mừng quý khách đến tiệm' },
+          { id: 'com_3', text: 'Please have a seat', sub: 'Mời bạn ngồi' },
+        ]
+      },
+      {
+        name: "Thanh toán",
+        items: [
+          { id: 'com_4', text: 'Cash or Card?', sub: 'Tiền mặt hay dùng thẻ?' },
+          { id: 'com_5', text: 'Do you want a receipt?', sub: 'Bạn có muốn lấy hóa đơn không?' },
+        ]
+      }
+    ]
+  },
+
+  // --- 1. NGÀNH NAILS & SPA ---
+  {
+    industry: 'nails',
+    title: "HÌNH DÁNG MÓNG (SHAPES)",
     icon: "📐",
     subGroups: [
       {
@@ -26,64 +53,58 @@ export const SPECIALIZED_VOCAB: SpecialVocabGroup[] = [
         items: [
           { id: 'ns_1', text: 'Square', sub: 'Móng vuông' },
           { id: 'ns_2', text: 'Round', sub: 'Móng tròn' },
-          { id: 'ns_3', text: 'Oval', sub: 'Móng bầu dục' },
-          { id: 'ns_4', text: 'Squoval', sub: 'Móng vuông bầu' },
-          { id: 'ns_5', text: 'Almond', sub: 'Móng hạnh nhân' },
-          { id: 'ns_6', text: 'Coffin / Ballerina', sub: 'Móng quan tài' },
-          { id: 'ns_7', text: 'Stiletto', sub: 'Móng nhọn hoắt' },
+          { id: 'ns_3', text: 'Almond', sub: 'Móng hạnh nhân' },
+          { id: 'ns_4', text: 'Coffin', sub: 'Móng quan tài' },
+          { id: 'ns_5', text: 'Stiletto', sub: 'Móng nhọn' },
         ]
       }
     ]
   },
   {
-    title: "2. DỤNG CỤ & THIẾT BỊ (TOOLS)",
+    industry: 'nails',
+    title: "KỸ THUẬT & DỤNG CỤ",
     icon: "⚙️",
     subGroups: [
       {
-        name: "Dụng cụ vệ sinh & mài",
+        name: "Dụng cụ vệ sinh",
         items: [
           { id: 'tl_1', text: 'Cuticle nippers', sub: 'Kiềm cắt da' },
-          { id: 'tl_2', text: 'Pusher', sub: 'Cây đẩy da' },
-          { id: 'tl_3', text: 'Nail drill / Drill bit', sub: 'Máy mài móng / Đầu mài' },
-          { id: 'tl_4', text: 'Sanding bands', sub: 'Đầu nhám cho máy mài' },
-          { id: 'tl_5', text: 'Sterilizer', sub: 'Máy tiệt trùng' },
-          { id: 'tl_6', text: 'LED / UV Lamp', sub: 'Đèn hơ móng' },
-          { id: 'tl_7', text: 'Foot basin', sub: 'Bồn ngâm chân' },
-          { id: 'tl_8', text: 'Nail probe', sub: 'Cây nạy khóe móng' },
+          { id: 'tl_2', text: 'Nail drill', sub: 'Máy mài móng' },
+          { id: 'tl_3', text: 'Buffer', sub: 'Cục chà nhám' },
         ]
       }
     ]
   },
+
+  // --- 2. NGÀNH BARTENDER ---
   {
-    title: "3. MÀU SẮC & HIỆU ỨNG (EFFECTS)",
-    icon: "🎨",
+    industry: 'bartender',
+    title: "DỤNG CỤ PHA CHẾ",
+    icon: "🍸",
     subGroups: [
       {
-        name: "Sơn & Trang trí",
+        name: "Dụng cụ cơ bản",
         items: [
-          { id: 'ce_1', text: 'Gel polish', sub: 'Sơn gel' },
-          { id: 'ce_2', text: 'Base gel / Top coat', sub: 'Sơn liên kết / Sơn bóng lớp cuối' },
-          { id: 'ce_3', text: 'Cat-eye (Fine/Coarse grain)', sub: 'Mắt mèo (hạt mịn/hạt to)' },
-          { id: 'ce_4', text: 'Matte finish', sub: 'Sơn lì (không bóng)' },
-          { id: 'ce_5', text: 'Chrome / Mirror effect', sub: 'Hiệu ứng tráng gương' },
-          { id: 'ce_6', text: 'French tips', sub: 'Sơn đầu móng kiểu Pháp' },
-          { id: 'ce_7', text: 'Quail egg / Speckled', sub: 'Hiệu ứng trứng cúc' },
+          { id: 'bt_1', text: 'Shaker', sub: 'Bình lắc' },
+          { id: 'bt_2', text: 'Jigger', sub: 'Ly đong' },
+          { id: 'bt_3', text: 'Strainer', sub: 'Dụng cụ lọc' },
         ]
       }
     ]
   },
+
+  // --- 3. NGÀNH FLOORING / CONSTRUCTION ---
   {
-    title: "4. KỸ THUẬT & TÌNH TRẠNG (TECH)",
-    icon: "🧤",
+    industry: 'flooring',
+    title: "VẬT LIỆU XÂY DỰNG",
+    icon: "🧱",
     subGroups: [
       {
-        name: "Dịch vụ nâng cao",
+        name: "Các loại sàn",
         items: [
-          { id: 'kt_1', text: 'Nail tips / Acrylic / Gel extensions', sub: 'Móng giả / Đắp bột / Úp gel' },
-          { id: 'kt_2', text: 'Cuticle care', sub: 'Chăm sóc da quanh móng' },
-          { id: 'kt_3', text: 'Ingrown nail', sub: 'Móng khóe' },
-          { id: 'kt_4', text: 'Nail fold / Sidewalls', sub: 'Rãnh móng / Khóe móng' },
-          { id: 'kt_5', text: 'Primer', sub: 'Sơn chống kiềm / Lớp lót khô móng' },
+          { id: 'fl_1', text: 'Hardwood', sub: 'Gỗ cứng' },
+          { id: 'fl_2', text: 'Laminate', sub: 'Gỗ công nghiệp' },
+          { id: 'fl_3', text: 'Ceramic Tile', sub: 'Gạch men' },
         ]
       }
     ]

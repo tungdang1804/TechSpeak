@@ -4,6 +4,7 @@ import LessonCard from '../components/LessonCard';
 import { Lesson, LessonStatus } from '../types';
 import { UserProfile } from '../services/userService';
 import { Sparkles, Star, Zap, LayoutGrid, Trophy, PlayCircle, Target, Lock } from 'lucide-react';
+import { INDUSTRIES } from '../services/content/industry';
 
 interface DashboardProps {
   lessons: Lesson[];
@@ -31,14 +32,6 @@ const Dashboard: React.FC<DashboardProps> = ({ lessons, onSelectLesson, onSelect
     ? Math.round(scores.reduce((acc: number, val: number) => acc + val, 0) / scores.length) 
     : 0;
 
-  const INDUSTRIES = [
-    { id: 'nails', name: 'Nail & Spa', emoji: '💅', status: 'available' },
-    { id: 'bartender', name: 'Bartender', emoji: '🍷', status: 'coming_soon' },
-    { id: 'flooring', name: 'Xây dựng', emoji: '🔨', status: 'coming_soon' },
-    { id: 'mechanic', name: 'Cơ khí', emoji: '🔧', status: 'coming_soon' },
-  ];
-
-  // Hiển thị +9999 cho điểm lớn
   const displayPoints = progress.points > 9999 ? "+9999" : progress.points;
 
   return (

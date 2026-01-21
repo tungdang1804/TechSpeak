@@ -1,31 +1,49 @@
 
 import { Lesson } from '../types';
+import { getIndustryInfo } from './content/industry';
 
-export const fetchLessonsFromManifest = async (): Promise<Lesson[]> => {
+/**
+ * Data Service
+ * Quản lý việc tải dữ liệu bài học động từ hệ thống file JSON.
+ * Cấu trúc: lessons/{industry_id}/lesson{n}.json
+ */
+
+export const fetchLessonsByIndustry = async (industryId: string = 'nails'): Promise<Lesson[]> => {
   try {
-    // Sử dụng đường dẫn tương đối ./ để tránh bị chặn bởi chính sách CORS của AI Studio
+    const industry = getIndustryInfo(industryId);
+    if (industry.status === 'coming_soon' && industryId !== 'nails') return [];
+
+    // 1. Tải manifest tổng
     const manifestResponse = await fetch('./lessons_manifest.json');
-    if (!manifestResponse.ok) throw new Error('Failed to load lessons manifest');
+    if (!manifestResponse.ok) throw new Error('Could not load lessons_manifest.json');
     
     const manifestData = await manifestResponse.json();
-    const lessonPaths: string[] = manifestData.lessons;
+    const industryData = manifestData.industries.find((i: any) => i.id === industryId);
+    
+    if (!industryData || !industryData.lessons || industryData.lessons.length === 0) {
+      console.warn(`No lessons found for industry: ${industryId}`);
+      return [];
+    }
 
-    // Fetch tất cả các file JSON bài học
-    const lessonPromises = lessonPaths.map(async (path) => {
-      // Đảm bảo path là tương đối
-      const cleanPath = path.startsWith('/') ? `.${path}` : `./${path}`;
-      const response = await fetch(cleanPath);
-      if (!response.ok) {
-        console.error(`Failed to load lesson at ${cleanPath}`);
+    // 2. Tải song song các bài học theo đường dẫn trong manifest
+    const lessonPromises = industryData.lessons.map(async (path: string) => {
+      // Đảm bảo đường dẫn chuẩn xác
+      const cleanPath = path.startsWith('./') ? path : `./${path}`;
+      try {
+        const response = await fetch(cleanPath);
+        if (!response.ok) return null;
+        return await response.json();
+      } catch (err) {
+        console.error(`Failed to fetch lesson at ${cleanPath}:`, err);
         return null;
       }
-      return response.json();
     });
 
-    const lessonsResults = await Promise.all(lessonPromises);
+    const results = await Promise.all(lessonPromises);
     
-    return lessonsResults
-      .filter((lesson): lesson is Lesson => lesson !== null)
+    // 3. Lọc bài học hợp lệ và sắp xếp
+    return results
+      .filter((l): l is Lesson => l !== null)
       .sort((a, b) => a.order - b.order);
   } catch (error) {
     console.error('Data Service Error:', error);

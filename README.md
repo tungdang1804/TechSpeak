@@ -1,68 +1,89 @@
-# 📚 TechSpeak Master - Technical Documentation (v3.0)
+# 📚 TechSpeak Master - Enterprise Technical Specification (v8.1 - Beta 0.7)
 
-TechSpeak Master là một nền tảng học tiếng Anh chuyên ngành được xây dựng theo kiến trúc **Layered Modular Architecture**, tối ưu hóa cho hiệu năng cao và độ ổn định (Production-Ready).
+TechSpeak Master được xây dựng dựa trên triết lý **"Zero-Classroom English"**, tập trung vào việc mô phỏng môi trường làm việc thực tế thông qua AI. Kiến trúc hệ thống tuân thủ mô hình **Clean Architecture** kết hợp với **Vertical Slice** để đảm bảo tính cô lập và khả năng mở rộng (Scalability).
 
-## 🚀 1. Các Cải tiến Hiệu năng & Ổn định (Performance & Stability)
+## 🚀 Phiên bản hiện tại: Beta 0.7
+- **Mô-đun Từ vựng Thông minh**: Phân loại Specialized vs General.
+- **AI Roleplay Engine**: Tích hợp chấm điểm chuyên sâu.
+- **Phòng học ảo 2D**: Visualizing tiến trình học tập.
+- **Hệ thống Audio Pipeline**: Giảm thiểu độ trễ TTS.
 
-Hệ thống đã được nâng cấp các cơ chế "lớp phòng vệ" để đảm bảo trải nghiệm người dùng mượt mà nhất:
-
-- **Request Throttling (Điều tiết yêu cầu)**: Triển khai hàng đợi thông minh với khoảng nghỉ `MIN_GAP_MS` (500ms). Ngăn chặn tình trạng gửi request dồn dập, giúp bảo vệ API Key khỏi các giới hạn tần suất.
-- **Exponential Backoff (Thử lại thông minh)**: Khi gặp lỗi `429 (Too Many Requests)`, hệ thống tự động đóng băng hàng đợi và thử lại sau một khoảng thời gian tăng dần, giúp ứng dụng tự phục hồi mà không cần tải lại trang.
-- **Persistent Caching (Lưu trữ bền vững)**: Sử dụng **IndexedDB** thay vì RAM cho bộ nhớ đệm âm thanh. 
-    - *Lợi ích*: Giảm 90% quota AI sau lần học đầu tiên, hỗ trợ học offline và tốc độ phản hồi tức thì (<10ms) cho các từ đã học.
-- **Mobile UI Optimization**: Giao diện Popup IPA và các Modal được thiết kế với cơ chế `overscroll-contain` và `fixed positioning`, đảm bảo hoạt động hoàn hảo trên các thiết bị iPhone (Dynamic Island) và Android có thanh điều hướng tùy biến.
-
-## 🌳 2. Cấu trúc Phân cấp (Architecture Hierarchy)
+## 🏗️ Deep Module Tree (Full Hierarchy)
 
 ```text
-ROOT (index.html / App.tsx)
+.
+├── 🏛️ app/                         # APPLICATION ENTRY & ROUTING
+│   ├── App.tsx                    # Root Component & Global Navigation Registry
+│   ├── index.tsx                  # Application bootstrap
+│   ├── types.ts                   # Centralized Domain Type Definitions (Source of Truth)
+│   └── constants.ts               # Global assets & configuration flags
 │
-├── 🧱 LAYER 1: Orchestration & Navigation
-│   ├── [Module] MainHeader (Branding, Points, User Profile Sync)
-│   ├── [Module] TabNavigation (Tab switching logic)
-│   └── [Layer] Global Overlays (UnlockModal, Loading States)
+├── 🚀 features/                    # VERTICAL SLICES (Feature-centric logic & UI)
+│   ├── 🎭 roleplay/               # AI Interaction Domain
+│   │   ├── RoleplayChat.tsx       # Smart Chat Container
+│   │   ├── useRoleplayLogic.ts    # State machine for AI turns
+│   │   └── RoleplaySummaryView.ts # Post-session analysis UI
+│   ├── 🕵️ detective/              # Gamification (Listening Skills)
+│   │   ├── StarDetective.tsx      # Main game engine UI
+│   │   ├── useDetectiveLogic.ts   # Audio-sync & scoring logic
+│   │   └── DetectiveChoiceGrid.ts # Dynamic choice rendering
+│   ├── 📚 library/                 # Knowledge Base Module
+│   │   ├── VocabularyModule.tsx   # Dynamic industry filtering
+│   │   ├── GrammarModule.tsx      # Real-world patterns
+│   │   └── IPAModule.tsx          # Phonetic lab
+│   └── 🛠️ onboarding/              # User Initiation Flow
+│       └── OnboardingWizard.tsx   # Multi-step profile setup
 │
-├── 🧱 LAYER 2: Major Feature Modules (Pages)
-│   │
-│   ├── 📁 Dashboard (Trải nghiệm cá nhân hóa)
-│   ├── 📁 Lesson Engine (Hệ thống bài học tương tác)
-│   │   └── [Unit] InteractiveText (Lookup Engine)
-│   ├── 📁 Library (Thư viện tri thức chuyên ngành)
-│   │   ├── [Module] Vocabulary (Persistent Store)
-│   │   ├── [Module] IPALab (Mobile Optimized UI)
-│   │   └── [Module] Grammar (AI Correction Store)
-│   └── 📁 Challenge Hub (Gamification)
+├── 🎯 domain/                      # BUSINESS LOGIC LAYER (Pure Domain Services)
+│   ├── 💰 economy/                # Economy & Progression
+│   │   └── economy.ts             # Star Points, Leveling, Star-rating logic
+│   ├── 🏥 industry/               # Industry Intelligence
+│   │   └── industry.ts            # Industry Registry & Contextual Resolvers
+│   └── 🔤 vocabulary/             # Knowledge Intelligence
+│       └── filterService.ts       # Dynamic Segregation (Specialized vs General)
 │
-├── ⚙️ LAYER 3: Business Logic (Custom Hooks)
-│   ├── useUserProgress (Firestore Real-time Sync)
-│   ├── useAudioRecorder (Native & Web Audio Bridge)
-│   └── useRoleplayLogic (Gemini Pro AI State Machine)
+├── 🛡️ core/                        # FOUNDATIONAL LAYER (Infrastructure)
+│   ├── 🧠 ai/                     # Gemini AI Integration Layer
+│   │   ├── base.ts                # API Client Initialization
+│   │   ├── dictionaryService.ts   # Contextual Meaning Resolver
+│   │   ├── assessmentService.ts   # Pronunciation Scoring Engine
+│   │   └── conversationService.ts # Roleplay Orchestrator
+│   ├── 🔊 audio/                  # Audio Pipeline Engine
+│   │   ├── engine.ts              # PCM Decoding & AudioContext Management
+│   │   ├── storage.ts             # IndexedDB Persistent Cache
+│   │   ├── queueManager.ts        # Throttling & Priority Queue
+│   │   └── api.ts                 # Gemini TTS Bridge
+│   └── 📡 firebase/               # Persistence & Auth Bridge
+│       ├── authService.ts         # User session & Account Upgrading
+│       └── userService.ts         # Cloud Profile Synchronizer
 │
-└── 🛠️ LAYER 4: Infrastructure (Low-level Services)
-    ├── [AI] conversation / assessment / dictionary services
-    ├── [Storage] IndexedDB Audio Cache Provider
-    └── [Utils] audioUtils (Throttling & Backoff Engine)
+├── 📂 content/                     # KNOWLEDGE REPOSITORY (JSON/Static)
+│   ├── 📖 lessons/                # Hierarchical JSON Lesson Files
+│   │   ├── nails/                 # Specialized Nail Lessons
+│   │   └── bartender/             # Specialized Bartender Lessons
+│   ├── 📊 data/                   # Static Datasets (IPA, Global Vocab)
+│   └── lessons_manifest.json      # Dynamic Content Registry (Catalog)
+│
+└── 🧩 shared/                      # CROSS-CUTTING CONCERNS
+    ├── components/                # UI Kit (Atomic: Flashcards, Recorders)
+    ├── hooks/                     # Common hooks (AppNavigation, AudioRecorder)
+    └── utils/                     # Generic Helpers (Base64, Formatting)
 ```
 
-## 🏗️ 3. Quy trình Xử lý Dữ liệu (Data Pipeline)
+## 🛠️ Key Design Patterns Applied
 
-### Luồng Âm thanh (Audio Pipeline):
-1. **Request**: Người dùng chạm vào nút phát âm thanh.
-2. **Cache Check**: Kiểm tra `IndexedDB`. Nếu thấy, phát ngay lập tức.
-3. **Queueing**: Nếu không thấy, đẩy yêu cầu vào `RequestQueue`.
-4. **Throttling**: Chờ đến lượt xử lý (đảm bảo gap 500ms).
-5. **AI Generation**: Gọi Gemini TTS API.
-6. **Persistence**: Lưu kết quả vào `IndexedDB` và phát ra loa.
+### 1. The "Push & Persist" Pattern (Vocabulary Intelligence)
+Hệ thống không bao giờ xóa dữ liệu. Khi người dùng chuyển đổi ngành nghề (`primaryIndustry`), logic tại `domain/vocabulary/filterService.ts` sẽ:
+- Đưa từ vựng ngành hiện tại vào **Specialized Pool**.
+- Tự động gộp toàn bộ từ vựng của các ngành cũ vào **General Pool** (Kho chung).
+=> Giúp người dùng tích lũy kiến thức đa ngành mà không bị rối loạn tiêu điểm.
 
-## 📈 4. Công nghệ sử dụng chính
+### 2. Audio Processing Pipeline (Latency Optimization)
+Để đạt độ trễ thấp nhất trong AI Conversation, chúng tôi áp dụng quy trình:
+`Gemini API (Base64) -> QueueManager (Prioritization) -> Storage (IndexedDB) -> Engine (PCM Decoding)`.
 
-| Phạm vi | Công nghệ | Mục đích |
-|:---|:---|:---|
-| **Runtime** | React 19 + TypeScript | Xây dựng ứng dụng bền vững |
-| **Storage** | IndexedDB | Lưu trữ cache âm thanh vĩnh viễn |
-| **AI** | Gemini 3 Flash/Pro | Chấm điểm & Hội thoại thực chiến |
-| **Backend** | Firebase Suite | Auth, Firestore, Cloud Storage |
-| **UI** | Tailwind CSS | JIT Animation & Responsive Layout |
+### 3. Content Manifest Injection
+Thay vì load cứng toàn bộ bài học, `services/dataService.ts` chỉ fetch `lessons_manifest.json` và tải các module bài học theo yêu cầu (Lazy Loading), giúp giảm 80% lưu lượng mạng ban đầu.
 
 ---
-*Tài liệu này được cập nhật theo phiên bản kiến trúc v3.0 (Production Optimized).*
+*TechSpeak Master: Architecture built for professional excellence.*

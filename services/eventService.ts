@@ -1,60 +1,45 @@
 
-import { GameChoice, GameCategory } from '../types';
+import { GameChoice } from '../types';
 import { COMMON_CHOICES } from '../data/gameData';
 
-export type BasketType = 'Booking' | 'Technique' | 'Payment' | 'SmallRequests' | 'Mixed';
+export type BasketType = 'Booking' | 'Technique' | 'Payment' | 'Mixed';
 
-const BASKETS: Record<string, string[]> = {
-  Booking: ['tm_today', 'tm_tomorrow', 'tm_weekend', 'tm_nextweek', 'tm_morning', 'tm_afternoon', 'tm_evening'],
-  Technique: ['sh_almond', 'sh_coffin', 'sh_square', 'sh_round', 'sh_oval', 'tl_drill', 'tl_nipper', 'tl_towel', 'dec_charms', 'dec_french', 'dec_stones', 'dec_art'],
-  Payment: ['pay_cash', 'pay_card', 'pay_tip'],
-  SmallRequests: ['tl_towel', 'col_glitter'] // Shared or specific small items
+const INDUSTRY_NAMES: Record<string, string> = {
+  nails: "Nail Salon",
+  bartender: "Cocktail Bar",
+  flooring: "Construction Site",
+  mechanic: "Auto Repair Shop"
 };
 
 /**
- * Lấy danh sách từ vựng theo "Giỏ" (Basket)
+ * Lấy danh sách từ vựng theo "Giỏ" và "Ngành"
  */
-export const getVocabularyFromBasket = (types: BasketType[]): GameChoice[] => {
-  let itemIds: string[] = [];
-  
-  if (types.includes('Mixed')) {
-    // Trộn Booking và Technique mặc định cho Mixed
-    itemIds = [...BASKETS.Booking, ...BASKETS.Technique];
-  } else {
-    types.forEach(type => {
-      if (BASKETS[type]) itemIds = [...itemIds, ...BASKETS[type]];
-    });
-  }
-
-  // Loại bỏ trùng lặp và map với dữ liệu gốc
-  const uniqueIds = Array.from(new Set(itemIds));
-  return COMMON_CHOICES.filter(choice => uniqueIds.includes(choice.id));
+export const getVocabularyByIndustry = (industryId: string, types: BasketType[]): GameChoice[] => {
+  return COMMON_CHOICES.filter(choice => 
+    choice.industry === industryId && 
+    (types.includes('Mixed') || types.some(t => choice.id.startsWith(t.toLowerCase().substring(0, 2))))
+  );
 };
 
 /**
- * Tạo context sạch cho AI để tránh "loãng" kịch bản
+ * Tạo context sạch cho AI dựa trên ngành nghề
  */
-export const generateEventContext = (type: BasketType): { choices: GameChoice[], prompt: string } => {
-  const choices = getVocabularyFromBasket([type]);
-  const labels = choices.map(c => c.label).join(', ');
+export const generateEventContext = (industryId: string, type: BasketType): { choices: GameChoice[], prompt: string } => {
+  // QUAN TRỌNG: Chỉ lấy choices thuộc ngành hiện tại
+  const choices = COMMON_CHOICES.filter(c => c.industry === industryId);
+  const industryName = INDUSTRY_NAMES[industryId] || industryId;
   
-  let prompt = "";
+  let typePrompt = "";
   switch(type) {
-    case 'Booking':
-      prompt = "Tập trung vào việc đặt lịch: ngày tháng, giờ giấc và số lượng người.";
-      break;
-    case 'Technique':
-      prompt = "Tập trung vào các kỹ thuật chuyên môn: dáng móng (shape), dụng cụ (tools) và trang trí (decoration).";
-      break;
-    case 'Payment':
-      prompt = "Tập trung vào quy trình thanh toán, tiền tip và các loại thẻ.";
-      break;
-    case 'Mixed':
-      prompt = "Kết hợp tình huống đặt lịch kèm theo các yêu cầu kỹ thuật phức tạp ngay trong cuộc gọi.";
-      break;
-    default:
-      prompt = "Tình huống giao tiếp nail salon tổng quát.";
+    case 'Booking': typePrompt = "scheduling, time and number of people"; break;
+    case 'Technique': typePrompt = "technical procedures, tools and professional materials"; break;
+    case 'Payment': typePrompt = "pricing, checkout and tipping"; break;
+    case 'Mixed': default: typePrompt = "various real-life professional communication scenarios"; break;
   }
+
+  const prompt = `You are a customer at a ${industryName}. Create short conversation snippets focusing on ${typePrompt}. 
+  ONLY use terms related to ${industryName}. DO NOT mention any other industries.
+  Strictly associate your scenarios with the provided valid choice IDs for this industry.`;
 
   return { choices, prompt };
 };

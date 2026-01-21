@@ -1,0 +1,47 @@
+
+{
+  "id": "nails_l8",
+  "order": 8,
+  "title": "Nail Repair & Warranty",
+  "description": "Xử lý bảo hành móng bị mẻ hoặc bong tróc.",
+  "thumbnail": "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=400&auto=format&fit=crop",
+  "context": {
+    "background": "Ms. Minh quay lại sau 3 ngày vì một móng bị mẻ.",
+    "goal": "Xác định thời gian và áp dụng chính sách bảo hành.",
+    "characters": [
+      { "name": "Tiên", "role": "Lễ tân." },
+      { "name": "Ms. Minh", "role": "Khách hàng." }
+    ]
+  },
+  "steps": [
+    {
+      "id": "nails_l8_s1",
+      "title": "Bước 1: Kiểm tra lịch sử",
+      "purpose": "Xác nhận thời hạn bảo hành",
+      "lines": [
+        {
+          "id": "nails_l8_s1_l1",
+          "speaker": "Tech",
+          "text": "When did you have them done? We have a 7-day warranty.",
+          "translation": "Chị làm bộ này từ khi nào ạ? Bên em có chính sách bảo hành 7 ngày."
+        }
+      ]
+    }
+  ],
+  "vocabularies": [
+    { "id": "v1", "word": "Warranty", "translation": "Bảo hành", "ipa": "/ˈwɔːrənti/" },
+    { "id": "v2", "word": "Chipped", "translation": "Bị mẻ", "ipa": "/tʃɪpt/" }
+  ],
+  "grammar_points": [
+    {
+      "id": "g1",
+      "title": "Past Time",
+      "description": "Hỏi thời điểm trong quá khứ.",
+      "examples": [{ "english": "When did you come?", "vietnamese": "Chị đến khi nào?" }]
+    }
+  ],
+  "roleplay": {
+    "ai_instructions": "You are Ms. Minh. One of your nails is chipped. You are a regular customer and expect a free fix.",
+    "user_instructions": "Bạn là lễ tân Tiên. Hãy kiểm tra ngày làm móng và sắp xếp thợ sửa miễn phí nếu còn trong 7 ngày."
+  }
+}
