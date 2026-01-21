@@ -42,6 +42,7 @@ export interface GrammarPoint {
   description: string;
   structure?: string;
   examples: { english: string; vietnamese: string }[];
+  isCollocation?: boolean;
 }
 
 export interface Lesson {

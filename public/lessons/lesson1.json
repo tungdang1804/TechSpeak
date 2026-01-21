@@ -23,10 +23,7 @@
           "id": "l1_s1_tech",
           "speaker": "Tech",
           "text": "Hello, Star Spa speaking. How can I help you today?",
-          "translation": "Xin chào, Star Spa xin nghe. Tôi có thể giúp gì cho bạn?",
-          "variations": [
-            { "id": "v1", "text": "Hi! This is Star Spa. Would you like to book an appointment?", "translation": "Chào bạn! Đây là Star Spa. Bạn muốn đặt lịch hẹn đúng không?" }
-          ]
+          "translation": "Xin chào, Star Spa xin nghe. Tôi có thể giúp gì cho bạn?"
         },
         {
           "id": "l1_s1_cust",
@@ -35,18 +32,88 @@
           "translation": "Chào bạn, tôi muốn đặt lịch cho ngày mai."
         }
       ]
+    },
+    {
+      "id": "l1_step2",
+      "title": "Bước 2: Xác định dịch vụ & Số người",
+      "purpose": "Thu thập thông tin để chuẩn bị thợ",
+      "lines": [
+        {
+          "id": "l1_s2_tech",
+          "speaker": "Tech",
+          "text": "And how many people are you? What service do you want?",
+          "translation": "Nhóm mình đi mấy người ạ? Và bạn muốn làm dịch vụ gì?"
+        },
+        {
+          "id": "l1_s2_cust",
+          "speaker": "Customer",
+          "text": "I want a full set and a pedicure.",
+          "translation": "Tôi muốn làm một bộ đầy đủ và làm móng chân."
+        }
+      ]
+    },
+    {
+      "id": "l1_step3",
+      "title": "Bước 3: Chốt thời gian & Tên khách",
+      "purpose": "Tìm khung giờ trống phù hợp",
+      "lines": [
+        {
+          "id": "l1_s3_tech",
+          "speaker": "Tech",
+          "text": "What time can you come? Is 2:30 available for you?",
+          "translation": "Bạn có thể ghé lúc mấy giờ? 2:30 có tiện cho bạn không?"
+        },
+        {
+          "id": "l1_s3_cust",
+          "speaker": "Customer",
+          "text": "My name is Minh. 2:30 is perfect.",
+          "translation": "Tên tôi là Minh. 2:30 là khung giờ tuyệt vời."
+        }
+      ]
+    },
+    {
+      "id": "l1_step4",
+      "title": "Bước 4: Xác nhận lại lịch",
+      "purpose": "Kiểm tra chéo thông tin cuối cùng",
+      "lines": [
+        {
+          "id": "l1_s4_tech",
+          "speaker": "Tech",
+          "text": "Thank you for booking. Ms. Minh, one full set and a pedicure at 2:30 tomorrow. See you then!",
+          "translation": "Cám ơn bạn đã đặt lịch. Chị Minh, một bộ đầy đủ và móng chân vào 2:30 ngày mai. Hẹn gặp lại chị nhé!"
+        }
+      ]
     }
   ],
   "vocabularies": [
-    { "id": "v1", "word": "Appointment", "translation": "Lịch hẹn", "ipa": "/əˈpɔɪntmənt/" },
-    { "id": "v2", "word": "Available", "translation": "Còn trống", "ipa": "/əˈveɪləbl/" }
+    { "id": "v1", "word": "Speaking", "translation": "Đang nghe máy", "ipa": "/ˈspiːkɪŋ/" },
+    { "id": "v2", "word": "Appointment", "translation": "Lịch hẹn", "ipa": "/əˈpɔɪntmənt/" },
+    { "id": "v3", "word": "Available", "translation": "Còn trống", "ipa": "/əˈveɪləbl/" },
+    { "id": "v4", "word": "Slot", "translation": "Khung giờ", "ipa": "/slɒt/" },
+    { "id": "v5", "word": "Confirmation", "translation": "Xác nhận", "ipa": "/ˌkɒnfəˈmeɪʃn/" }
   ],
   "grammar_points": [
     {
       "id": "g1",
-      "title": "Cấu trúc hỏi nhu cầu",
-      "description": "Dùng 'What service' để hỏi dịch vụ.",
-      "examples": [{ "english": "What service do you want?", "vietnamese": "Bạn muốn làm dịch vụ gì?" }]
+      "title": "WH-Questions (Hỏi nhu cầu)",
+      "description": "Cấu trúc dùng để lấy thông tin cụ thể.",
+      "examples": [{ "english": "What time would you like?", "vietnamese": "Bạn muốn mấy giờ?" }]
+    },
+    {
+      "id": "g2",
+      "title": "Choice Questions (Câu hỏi lựa chọn)",
+      "description": "Dùng cấu trúc A or B? để đưa gợi ý.",
+      "examples": [{ "english": "Is it for one person or two?", "vietnamese": "Lịch này cho một hay hai người ạ?" }]
+    },
+    {
+      "id": "col1",
+      "title": "Collocations quan trọng",
+      "isCollocation": true,
+      "description": "Các cụm từ cố định trong đặt lịch.",
+      "examples": [
+        { "english": "Book an appointment", "vietnamese": "Đặt một lịch hẹn" },
+        { "english": "How can I help you?", "vietnamese": "Tôi có thể giúp gì cho bạn?" }
+      ]
     }
   ],
   "roleplay": {

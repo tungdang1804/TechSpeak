@@ -4,23 +4,21 @@ import {
   onAuthStateChanged, 
   User,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signOut,
-  linkWithCredential,
-  linkWithPopup,
   EmailAuthProvider,
+  linkWithCredential,
+  updateProfile,
+  linkWithPopup,
   GoogleAuthProvider,
-  updateProfile
+  signInWithPopup
 } from "firebase/auth";
 import { auth } from "./firebase";
+import { clearProfileCache } from "./userService";
 
 /**
- * Chỉ đăng nhập ẩn danh nếu chưa có User nào hiện diện
+ * Đăng nhập ẩn danh
  */
 export const loginAnonymously = async () => {
-  // Nếu đã có user thì dùng tiếp, không tạo mới để tránh nhảy UID khi hot-reload
-  if (auth.currentUser) return auth.currentUser; 
-  
   try {
     const userCredential = await signInAnonymously(auth);
     return userCredential.user;
@@ -52,20 +50,31 @@ export const upgradeAccount = async (email: string, password: string, displayNam
 };
 
 /**
- * Nâng cấp tài khoản ẩn danh bằng Google
+ * Đăng nhập hoặc Liên kết bằng Google
  */
-export const linkGoogleAccount = async () => {
-  const user = auth.currentUser;
-  if (!user) throw new Error("No user logged in");
-
+export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
-    const userCredential = await linkWithPopup(user, provider);
-    return userCredential.user;
-  } catch (error: any) {
-    if (error.code === 'auth/credential-already-in-use') {
-      throw new Error("Tài khoản Google này đã được liên kết với một người dùng khác.");
+    // Nếu đang là khách (anonymous), thử liên kết tài khoản
+    if (auth.currentUser && auth.currentUser.isAnonymous) {
+      try {
+        const userCredential = await linkWithPopup(auth.currentUser, provider);
+        return userCredential.user;
+      } catch (linkError: any) {
+        // Nếu tài khoản Google đã tồn tại ở một project khác, thực hiện đăng nhập bình thường
+        if (linkError.code === 'auth/credential-already-in-use' || linkError.code === 'auth/email-already-in-use') {
+          const userCredential = await signInWithPopup(auth, provider);
+          return userCredential.user;
+        }
+        throw linkError;
+      }
+    } else {
+      // Nếu chưa có user hoặc không phải anonymous, đăng nhập bình thường
+      const userCredential = await signInWithPopup(auth, provider);
+      return userCredential.user;
     }
+  } catch (error: any) {
+    console.error("Google Auth Error:", error);
     throw error;
   }
 };
@@ -85,4 +94,14 @@ export const subscribeToAuthChanges = (callback: (user: User | null) => void) =>
   return onAuthStateChanged(auth, callback);
 };
 
-export const logout = () => signOut(auth);
+/**
+ * Đăng xuất và dọn dẹp
+ */
+export const logout = async () => {
+  try {
+    clearProfileCache();
+    await signOut(auth);
+  } catch (e) {
+    console.error("Logout failed:", e);
+  }
+};

@@ -2,11 +2,11 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 
 export type VoiceGender = 'female' | 'male';
-export type SpeechContext = 'greeting' | 'instruction' | 'normal' | 'fast';
+export type SpeechContext = 'greeting' | 'instruction' | 'normal' | 'fast' | 'phonetic';
 
 export const VOICE_MODELS = {
-  female: { name: 'Ms. Minh', voiceId: 'Kore', description: 'Giọng nữ trầm ấm, chuyên nghiệp' },
-  male: { name: 'Mr. Nam', voiceId: 'Puck', description: 'Giọng nam dõng dạc, rõ ràng' }
+  female: { name: 'Ms. Minh', voiceId: 'Kore', description: 'Giọng nữ trầm ấm' },
+  male: { name: 'Mr. Nam', voiceId: 'Puck', description: 'Giọng nam chuyên nghiệp' }
 };
 
 let currentGender: VoiceGender = (localStorage.getItem('voiceGender') as VoiceGender) || 'female';
@@ -15,6 +15,13 @@ const audioBufferCache = new Map<string, AudioBuffer>();
 let activeAudioSource: AudioBufferSourceNode | null = null;
 let activeAudioContext: AudioContext | null = null;
 let currentPlayingKey: string | null = null;
+
+const getAudioContext = () => {
+  if (!activeAudioContext || activeAudioContext.state === 'closed') {
+    activeAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+  }
+  return activeAudioContext;
+};
 
 export const stopAllAudio = () => {
   if (activeAudioSource) {
@@ -35,29 +42,12 @@ export const setVoicePreference = (gender: VoiceGender) => {
 
 export const getVoicePreference = (): VoiceGender => currentGender;
 
-/**
- * Cố định phong cách đọc theo yêu cầu:
- * <speak><prosody rate="85%" pitch="-1st">[Văn bản]</prosody></speak>
- */
-export const generateProsodyPrompt = (text: string, context: SpeechContext): string => {
-  if (context === 'fast') return text;
-  // Gửi chỉ dẫn SSML giả lập thông qua Prompt cho Gemini 2.5 TTS
-  return `Please speak the following text at a rate of 85% and pitch -1st, like a professional technician: "${text}"`;
-};
-
-export const blobToBase64 = (blob: Blob): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result.split(',')[1]);
-      } else {
-        reject(new Error("Failed to convert blob"));
-      }
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+export const wrapSSML = (text: string, context: SpeechContext = 'normal'): string => {
+  const cleanText = text.replace(/[<>]/g, '');
+  if (context === 'phonetic') {
+    return `Pronounce the isolated phonetic sound for this symbol clearly: /${cleanText}/. Do not say any words, just the sound.`;
+  }
+  return `Say this clearly at 85% speed with a professional tone: "${cleanText}"`;
 };
 
 export async function decodeAudioData(
@@ -66,17 +56,25 @@ export async function decodeAudioData(
   sampleRate: number = 24000,
   numChannels: number = 1,
 ): Promise<AudioBuffer> {
-  const dataInt16 = new Int16Array(data.buffer);
-  const frameCount = dataInt16.length / numChannels;
-  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+  // Đảm bảo xử lý dữ liệu từ ArrayBuffer gốc một cách an toàn
+  const buffer = data.buffer;
+  const offset = data.byteOffset;
+  const length = data.byteLength;
+  
+  // Tạo view Int16 chính xác từ dữ liệu PCM raw
+  const bufferView = new Int16Array(buffer, offset, length / 2);
+  const frameCount = bufferView.length / numChannels;
+  const audioBuffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
 
   for (let channel = 0; channel < numChannels; channel++) {
-    const channelData = buffer.getChannelData(channel);
+    const channelData = audioBuffer.getChannelData(channel);
     for (let i = 0; i < frameCount; i++) {
-      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+      // Chuyển đổi chính xác biên độ để tránh méo tiếng (distortion/rè)
+      const val = bufferView[i * numChannels + channel];
+      channelData[i] = val < 0 ? val / 32768.0 : val / 32767.0;
     }
   }
-  return buffer;
+  return audioBuffer;
 }
 
 function decodeBase64(base64: string) {
@@ -88,18 +86,27 @@ function decodeBase64(base64: string) {
   return bytes;
 }
 
+export const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = (reader.result as string).split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 export const preloadAudio = async (text: string, context: SpeechContext = 'normal') => {
   const voiceName = currentGender === 'female' ? VOICE_MODELS.female.voiceId : VOICE_MODELS.male.voiceId;
   const cacheKey = `${voiceName}_${text}_${context}`;
   
   if (audioBufferCache.has(cacheKey)) return;
 
-  if (!activeAudioContext || activeAudioContext.state === 'closed') {
-    activeAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-  }
-
+  const ctx = getAudioContext();
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = generateProsodyPrompt(text, context);
+  const prompt = wrapSSML(text, context);
 
   try {
     const response = await ai.models.generateContent({
@@ -115,11 +122,11 @@ export const preloadAudio = async (text: string, context: SpeechContext = 'norma
 
     const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
     if (base64Audio) {
-      const audioBuffer = await decodeAudioData(decodeBase64(base64Audio), activeAudioContext);
+      const audioBuffer = await decodeAudioData(decodeBase64(base64Audio), ctx);
       audioBufferCache.set(cacheKey, audioBuffer);
     }
   } catch (error) {
-    console.warn("Preload failed:", text);
+    console.warn("TTS preload failed:", text);
   }
 };
 
@@ -130,10 +137,10 @@ export const playAudio = async (text: string, context: SpeechContext = 'normal')
   stopAllAudio();
   currentPlayingKey = cacheKey;
 
-  if (!activeAudioContext || activeAudioContext.state === 'closed') {
-    activeAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+  const ctx = getAudioContext();
+  if (ctx.state === 'suspended') {
+    await ctx.resume();
   }
-  const ctx = activeAudioContext;
 
   const playFromBuffer = (buffer: AudioBuffer) => {
     if (currentPlayingKey !== cacheKey) return;
@@ -141,7 +148,7 @@ export const playAudio = async (text: string, context: SpeechContext = 'normal')
     source.buffer = buffer;
     source.connect(ctx.destination);
     activeAudioSource = source;
-    source.start();
+    source.start(0);
     return new Promise((resolve) => {
       source.onended = () => {
         if (activeAudioSource === source) activeAudioSource = null;

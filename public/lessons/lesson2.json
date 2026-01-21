@@ -16,14 +16,14 @@
   "steps": [
     {
       "id": "l2_step1",
-      "title": "Bước 1: Chào đón",
-      "purpose": "Xác nhận lịch hẹn",
+      "title": "Bước 1: Chào đón & Kiểm tra lịch",
+      "purpose": "Xác nhận lịch hẹn chuyên nghiệp",
       "lines": [
         {
           "id": "l2_s1_cust",
           "speaker": "Customer",
           "text": "Hi, my name is Minh. I booked an appointment for 2:30.",
-          "translation": "Chào bạn, tôi là Minh. Tôi có lịch lúc 2:30."
+          "translation": "Chào bạn, tôi là Minh. Tôi đã có lịch lúc 2:30."
         },
         {
           "id": "l2_s1_tech",
@@ -32,18 +32,75 @@
           "translation": "Chào mừng chị Minh. Chỗ ngồi của chị đã sẵn sàng."
         }
       ]
+    },
+    {
+      "id": "l2_step2",
+      "title": "Bước 2: Hỏi nhu cầu & Ý định",
+      "purpose": "Tìm hiểu mục đích sử dụng bộ móng",
+      "lines": [
+        {
+          "id": "l2_s2_tech",
+          "speaker": "Tech",
+          "text": "What would you like to get done today?",
+          "translation": "Hôm nay chị muốn làm gì ạ?"
+        },
+        {
+          "id": "l2_s2_cust",
+          "speaker": "Customer",
+          "text": "I'm attending a big event, so I need an elegant and unique nail set.",
+          "translation": "Tôi chuẩn bị dự một sự kiện lớn nên cần một bộ móng sang trọng và độc đáo."
+        }
+      ]
+    },
+    {
+      "id": "l2_step3",
+      "title": "Bước 3: Tư vấn thiết kế",
+      "purpose": "Gợi ý mẫu mã phù hợp",
+      "lines": [
+        {
+          "id": "l2_s3_tech_1",
+          "speaker": "Tech",
+          "text": "Do you have a design in mind? We have a new 3D powder art style.",
+          "translation": "Chị đã có mẫu nào chưa ạ? Tiệm em mới có kiểu đắp bột nổi 3D."
+        },
+        {
+          "id": "l2_s3_cust",
+          "speaker": "Customer",
+          "text": "Beautiful! That suits me very well.",
+          "translation": "Đẹp quá! Kiểu đó rất hợp với tôi."
+        }
+      ]
     }
   ],
   "vocabularies": [
-    { "id": "v1", "word": "Elegant", "translation": "Sang trọng", "ipa": "/ˈelɪɡənt/" },
-    { "id": "v2", "word": "Cat-eye", "translation": "Mắt mèo", "ipa": "/kæt aɪ/" }
+    { "id": "v1", "word": "Station", "translation": "Vị trí làm việc", "ipa": "/ˈsteɪʃn/" },
+    { "id": "v2", "word": "Elegant", "translation": "Sang trọng", "ipa": "/ˈelɪɡənt/" },
+    { "id": "v3", "word": "Unique", "translation": "Độc đáo", "ipa": "/juˈniːk/" },
+    { "id": "v4", "word": "Transformation", "translation": "Thay đổi diện mạo", "ipa": "/ˌtrænsfəˈmeɪʃn/" },
+    { "id": "v5", "word": "Waiting area", "translation": "Khu vực chờ", "ipa": "/ˈweɪtɪŋ ˈeəriə/" }
   ],
   "grammar_points": [
     {
       "id": "g1",
-      "title": "Đề nghị lịch sự",
-      "description": "Dùng 'Would you like to...?'",
+      "title": "Polite Request (Đề nghị lịch sự)",
+      "description": "Dùng 'Would you like to' để mời khách.",
       "examples": [{ "english": "Would you like to take a look?", "vietnamese": "Chị có muốn xem qua không?" }]
+    },
+    {
+      "id": "g2",
+      "title": "Future Continuous (Xác nhận kế hoạch)",
+      "description": "Dùng để hỏi về chuỗi dịch vụ.",
+      "examples": [{ "english": "Will you be doing both manicure and pedicure?", "vietnamese": "Chị làm cả tay lẫn chân luôn chứ?" }]
+    },
+    {
+      "id": "col1",
+      "title": "Collocations tư vấn",
+      "isCollocation": true,
+      "description": "Cụm từ hay dùng khi thảo luận mẫu.",
+      "examples": [
+        { "english": "Have a design in mind", "vietnamese": "Có sẵn ý tưởng trong đầu" },
+        { "english": "Suits you very well", "vietnamese": "Rất phù hợp với bạn" }
+      ]
     }
   ],
   "roleplay": {

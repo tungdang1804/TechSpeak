@@ -3,15 +3,14 @@
   "id": "lesson_5",
   "order": 5,
   "title": "Nail Art & Finishing",
-  "description": "Nghệ thuật sơn gel, vẽ trang trí (French tips, charms) và phủ bóng hoàn thiện.",
+  "description": "Nghệ thuật sơn gel, vẽ trang trí và phủ bóng.",
   "thumbnail": "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
   "context": {
-    "background": "Móng đã có form chuẩn. Hân bắt đầu quy trình sơn gel và trang trí nghệ thuật.",
+    "background": "Hân bắt đầu quy trình sơn gel và trang trí nghệ thuật.",
     "goal": "Điều hướng khách hơ đèn, thực hiện thử màu và xác nhận trang trí.",
     "characters": [
       { "name": "Hân", "role": "Kỹ thuật viên trang trí móng." },
-      { "name": "Ms. Minh", "role": "Khách hàng chọn màu." },
-      { "name": "Mi", "role": "Học viên quan sát." }
+      { "name": "Ms. Minh", "role": "Khách hàng chọn màu." }
     ]
   },
   "steps": [
@@ -36,15 +35,34 @@
     }
   ],
   "vocabularies": [
-    { "id": "l5_v3", "word": "Shade", "translation": "Tông màu", "ipa": "/ʃeɪd/" },
-    { "id": "l5_v6", "word": "Charms", "translation": "Phụ kiện", "ipa": "/tʃɑːmz/" }
+    { "id": "v1", "word": "Shade", "translation": "Tông màu", "ipa": "/ʃeɪd/" },
+    { "id": "v2", "word": "Two coats", "translation": "Hai lớp sơn", "ipa": "/tuː kəʊts/" },
+    { "id": "v3", "word": "Pinky finger", "translation": "Ngón út", "ipa": "/ˈpɪŋki ˈfɪŋɡər/" },
+    { "id": "v4", "word": "Shine", "translation": "Độ bóng", "ipa": "/ʃaɪn/" },
+    { "id": "v5", "word": "Wipe off", "translation": "Lau sạch", "ipa": "/waɪp ɒf/" }
   ],
   "grammar_points": [
     {
-      "id": "l5_g1",
-      "title": "Mệnh lệnh lịch sự",
-      "description": "Dùng 'Please + [Verb]' để hướng dẫn khách.",
-      "examples": [{ "english": "Please put your hand in the lamp.", "vietnamese": "Vui lòng đặt tay vào đèn ạ." }]
+      "id": "g1",
+      "title": "Conditionals (Câu điều kiện)",
+      "description": "Dùng để trấn an khách khi hơ đèn.",
+      "examples": [{ "english": "If it feels hot, please take your hand out.", "vietnamese": "Nếu nóng quá chị cứ rút tay ra nhé." }]
+    },
+    {
+      "id": "g2",
+      "title": "Polite Commands (Mệnh lệnh lịch sự)",
+      "description": "Hướng dẫn khách đặt đúng ngón tay.",
+      "examples": [{ "english": "Put only your thumb in the lamp, please?", "vietnamese": "Chỉ đặt ngón cái vào đèn thôi chị nhé?" }]
+    },
+    {
+      "id": "col1",
+      "title": "Collocations hoàn thiện",
+      "isCollocation": true,
+      "description": "Cụm từ khi sơn màu.",
+      "examples": [
+        { "english": "Try the color", "vietnamese": "Thử màu sơn" },
+        { "english": "Long-lasting shine", "vietnamese": "Độ bóng bền lâu" }
+      ]
     }
   ],
   "roleplay": {

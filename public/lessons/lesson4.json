@@ -3,14 +3,13 @@
   "id": "lesson_4",
   "order": 4,
   "title": "Nail Extension & Shaping",
-  "description": "Kỹ thuật dũa nhám, gắn móng tip, đắp gel và tạo dáng móng (Almond, Square, Coffin).",
+  "description": "Kỹ thuật gắn móng tip, đắp gel và tạo dáng móng.",
   "thumbnail": "https://images.unsplash.com/photo-1604902396830-aca29e19b067?q=80&w=400&auto=format&fit=crop",
   "context": {
-    "background": "Sau khi làm sạch da, Hân bắt đầu xử lý bề mặt móng để chuẩn bị gắn móng giả. Đây là giai đoạn kỹ thuật then chốt để đảm bảo độ bền.",
-    "goal": "Thực hiện quy trình chuẩn bị bề mặt, tư vấn và thực hiện các kỹ thuật nối móng, đồng thời kiểm tra độ cân đối.",
+    "background": "Hân bắt đầu xử lý bề mặt móng để gắn móng giả.",
+    "goal": "Tư vấn và thực hiện tạo dáng móng hoàn hảo.",
     "characters": [
-      { "name": "Hân", "role": "Kỹ thuật viên thực hiện kỹ thuật chính." },
-      { "name": "Mi", "role": "Học viên quan sát." },
+      { "name": "Hân", "role": "Kỹ thuật viên chính." },
       { "name": "Ms. Minh", "role": "Khách hàng chọn dáng móng." }
     ]
   },
@@ -18,7 +17,7 @@
     {
       "id": "l4_step1",
       "title": "Bước 1: Chuẩn bị bề mặt",
-      "purpose": "Giải thích lý do mài nhám để tăng độ bám dính",
+      "purpose": "Giải thích lý do mài nhám để tăng độ bền",
       "lines": [
         {
           "id": "l4_s1_tech",
@@ -29,22 +28,79 @@
         {
           "id": "l4_s1_cust",
           "speaker": "Customer",
-          "text": "Okay, I'm ready.",
-          "translation": "Được rồi, tôi sẵn sàng."
+          "text": "Okay, I'm ready. I also want to protect my skin from the UV light.",
+          "translation": "Được rồi, tôi sẵn sàng. Tôi cũng muốn bảo vệ da khỏi tia UV."
+        }
+      ]
+    },
+    {
+      "id": "l4_step2",
+      "title": "Bước 2: Chọn Form móng",
+      "purpose": "Xác định hình dáng móng mong muốn",
+      "lines": [
+        {
+          "id": "l4_s2_tech",
+          "speaker": "Tech",
+          "text": "Which nail shape do you prefer: Almond, Square, or Coffin?",
+          "translation": "Chị thích dáng móng nào hơn: Hạnh nhân, Vuông hay Quan tài?"
+        },
+        {
+          "id": "l4_s2_cust",
+          "speaker": "Customer",
+          "text": "I'll go with Almond shape and Gel extensions, please.",
+          "translation": "Cho tôi dáng hạnh nhân và úp gel nhé."
+        }
+      ]
+    },
+    {
+      "id": "l4_step3",
+      "title": "Bước 3: Kiểm tra độ dài",
+      "purpose": "Chốt độ dài trước khi dũa",
+      "lines": [
+        {
+          "id": "l4_s3_tech",
+          "speaker": "Tech",
+          "text": "Is this length okay for you, or should I cut it shorter?",
+          "translation": "Độ dài này ổn với chị chưa, hay em nên cắt ngắn thêm ạ?"
+        },
+        {
+          "id": "l4_s3_cust",
+          "speaker": "Customer",
+          "text": "This length is perfect. Make sure they are straight.",
+          "translation": "Độ dài này hoàn hảo rồi. Nhớ dũa thẳng dùm tôi nhé."
         }
       ]
     }
   ],
   "vocabularies": [
-    { "id": "l4_v1", "word": "Buff", "translation": "Dũa nhám", "ipa": "/bʌf/" },
-    { "id": "l4_v6", "word": "Almond shape", "translation": "Dáng hạnh nhân", "ipa": "/ˈɑːmənd ʃeɪp/" }
+    { "id": "v1", "word": "Surface", "translation": "Bề mặt", "ipa": "/ˈsɜːfɪs/" },
+    { "id": "v2", "word": "Protect", "translation": "Bảo vệ", "ipa": "/prəˈtekt/" },
+    { "id": "v3", "word": "Natural look", "translation": "Vẻ tự nhiên", "ipa": "/ˈnætʃrəl lʊk/" },
+    { "id": "v4", "word": "Straight", "translation": "Thẳng", "ipa": "/streɪt/" },
+    { "id": "v5", "word": "Aligned", "translation": "Đều hàng", "ipa": "/əˈlaɪnd/" }
   ],
   "grammar_points": [
     {
-      "id": "l4_g1",
-      "title": "Cấu trúc mục đích",
-      "description": "Dùng 'so that' để giải thích kết quả của hành động.",
-      "examples": [{ "english": "I buff the surface so that the gel stays longer.", "vietnamese": "Em mài nhám để gel bền hơn." }]
+      "id": "g1",
+      "title": "Purpose Structure (Cấu trúc mục đích)",
+      "description": "Dùng 'so that' để giải thích kết quả.",
+      "examples": [{ "english": "Buff the surface so that the gel stays longer.", "vietnamese": "Dũa nhám để gel bám bền hơn." }]
+    },
+    {
+      "id": "g2",
+      "title": "Suggestion (Đề xuất)",
+      "description": "Đưa ra lời khuyên kỹ thuật.",
+      "examples": [{ "english": "I suggest gel extensions for you.", "vietnamese": "Em đề xuất úp gel cho chị." }]
+    },
+    {
+      "id": "col1",
+      "title": "Collocations tạo hình",
+      "isCollocation": true,
+      "description": "Các cụm từ khi làm form.",
+      "examples": [
+        { "english": "Put on gloves", "vietnamese": "Đeo găng tay" },
+        { "english": "File the edges", "vietnamese": "Dũa lại các cạnh" }
+      ]
     }
   ],
   "roleplay": {

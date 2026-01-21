@@ -1,31 +1,63 @@
 
 import { GoogleGenAI, Chat, Type } from "@google/genai";
-import { GameRound, GameChoice, RoleplayTurnResponse, RoleplaySummary } from "../types";
+import { GameRound, GameChoice, RoleplayTurnResponse, RoleplaySummary, Vocabulary } from "../types";
 import { getUsageStatus, recordUsage } from "./usageService";
 import { auth } from "./firebase";
 import { ADMIN_UID } from "./userService";
+import { generateEventContext, BasketType } from "./eventService";
 
 const createAIClient = () => {
   return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
-export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRound[]> => {
+/**
+ * Tra cứu chi tiết một từ vựng bất kỳ bằng AI
+ */
+export const fetchWordDetail = async (word: string): Promise<Partial<Vocabulary>> => {
+  const ai = createAIClient();
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Define the English word/phrase: "${word}" in the context of Technical Nail/Beauty services. 
+      Return JSON with: translation (Vietnamese), definition (short Vietnamese), ipa, and a short exampleSentence.`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            translation: { type: Type.STRING },
+            definition: { type: Type.STRING },
+            ipa: { type: Type.STRING },
+            exampleSentence: { type: Type.STRING }
+          },
+          required: ["translation", "definition", "ipa"]
+        }
+      }
+    });
+    const data = JSON.parse(response.text || '{}');
+    return { ...data, word, id: `ai_${Date.now()}` };
+  } catch (error) {
+    console.error("Word Detail Error:", error);
+    return { word, translation: "Không thể tra cứu", ipa: "/.../" };
+  }
+};
+
+export const generateGameRounds = async (basketType: BasketType = 'Mixed'): Promise<GameRound[]> => {
   const uid = auth.currentUser?.uid;
   const usage = await getUsageStatus(uid);
   if (usage.isExceeded) return [];
 
+  const { choices, prompt } = generateEventContext(basketType);
+  const choicesContext = choices.map(c => `{id: "${c.id}", label: "${c.label}"}`).join(', ');
+
   const ai = createAIClient();
-  const bookingChoices = choices.filter(c => 
-    c.category === 'Style' || c.category === 'Payment' || 
-    ['Pedicure', 'Manicure', 'Full set'].some(s => c.label.includes(s))
-  );
-
-  const choicesContext = bookingChoices.map(c => `{id: "${c.id}", label: "${c.label}"}`).join(', ');
-
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Generate 5 Nail Salon Booking challenges. Choices: [${choicesContext}].`,
+      contents: `Generate 5 Nail Salon challenges. 
+      Context: ${prompt}
+      Strictly use ONLY these labels for correctIds: [${choicesContext}].
+      Return exactly 5 objects.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -45,6 +77,7 @@ export const generateGameRounds = async (choices: GameChoice[]): Promise<GameRou
     recordUsage(uid);
     return JSON.parse(response.text || '[]');
   } catch (error) {
+    console.error("Game Generation Error:", error);
     return [];
   }
 };
@@ -86,10 +119,16 @@ export const createRoleplaySession = (context: string, level: number = 1) => {
   const ai = createAIClient();
   const systemInstruction = `You are a professional customer at a Nail Salon. Context: ${context}.
   Difficulty: Level ${level}. 
+  
   SATISFACTION RULES:
-  - Start at 60%. Be strict.
-  - If user grammar is bad, decrease 10%.
-  - If user is professional, increase 5%.
+  - Start at 60%. Be strict but fair.
+  - If user grammar is bad or unprofessional, decrease 10%.
+  - If user is professional and polite, increase 5%.
+  - Negotiation is allowed. If a customer asks for an impossible time, you can negotiate.
+  
+  GOAL TRACKING:
+  - Keep track of: Date, Time, Service, Number of people.
+  
   satisfaction_reason MUST be in Vietnamese.
   Return JSON only.`;
   
@@ -129,9 +168,8 @@ export const sendRoleplayMessage = async (chat: Chat, audioBase64: string | null
   const uid = auth.currentUser?.uid;
   const usage = await getUsageStatus(uid);
   
-  // Nếu là Admin thì bỏ qua chặn
   if (usage.isExceeded && uid !== ADMIN_UID) {
-    return { ai_response: "Đã hết lượt thử thách hôm nay!", user_transcript: "", score: 0, feedback: "", satisfaction: 50, is_finished: true, task_checklist: [], completion_percentage: 0, error: 'LIMIT_EXCEEDED' };
+    return { ai_response: "Hết lượt dùng hôm nay. Quay lại ngày mai nhé!", user_transcript: "", score: 0, feedback: "", satisfaction: 50, is_finished: true, task_checklist: [], completion_percentage: 0, error: 'LIMIT_EXCEEDED' };
   }
 
   try {
@@ -144,8 +182,8 @@ export const sendRoleplayMessage = async (chat: Chat, audioBase64: string | null
     return JSON.parse(result.text || '{}');
   } catch (error: any) {
     const isRateLimit = error?.message?.includes('429') || error?.status === 429;
-    if (isRateLimit) return { ai_response: "API Google (Pro) đang đạt giới hạn tốc độ. Vui lòng đợi 20 giây.", user_transcript: "", score: 0, feedback: "API Rate Limit", satisfaction: 50, is_finished: false, task_checklist: [], completion_percentage: 0, error: 'API_OVERLOAD' };
-    return { ai_response: "Lỗi kết nối AI.", user_transcript: "", score: 0, feedback: "", satisfaction: 50, is_finished: false, task_checklist: [], completion_percentage: 0 };
+    if (isRateLimit) return { ai_response: "API Google đang bận (429). Đợi xíu nhé.", user_transcript: "", score: 0, feedback: "API Rate Limit", satisfaction: 50, is_finished: false, task_checklist: [], completion_percentage: 0, error: 'API_OVERLOAD' };
+    return { ai_response: "Mất kết nối với AI.", user_transcript: "", score: 0, feedback: "", satisfaction: 50, is_finished: false, task_checklist: [], completion_percentage: 0 };
   }
 };
 
@@ -157,18 +195,14 @@ export const analyzeConversationHistory = async (history: { role: string; text: 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
-      contents: `Analyze this roleplay. 
-      CRITICAL SCORING RULES:
-      1. Use 100-point scale ONLY.
-      2. scores.content: 0-40
-      3. scores.fluency: 0-30
-      4. scores.pronunciation: 0-20
-      5. scores.grammar: 0-10
-      Total must be the SUM of above.
+      contents: `Analyze this roleplay conversation strictly. 
+      Total score must be the SUM of these components:
+      1. Content/Professionalism: 0-40
+      2. Fluency/Confidence: 0-30
+      3. Pronunciation/Clarity: 0-20
+      4. Grammar/Accuracy: 0-10
       
-      IMPROVEMENTS:
-      - "incorrect": Exactly what user said wrong.
-      - "correct": The proper professional version.
+      Return IMPROVEMENTS with precise "incorrect" (what user said) and "correct" (professional version) strings.
       
       Conversation:
       ${conversationText}`,

@@ -1,38 +1,120 @@
 
-import React from 'react';
-import { Trophy, Mic, Headphones, PenTool, Lock, ChevronRight, Star } from 'lucide-react';
+import React, { useState } from 'react';
+// Fix: Added ChevronDown to the imported icons from lucide-react
+import { Trophy, Mic, Headphones, PenTool, Lock, ChevronRight, Star, Shuffle, BookOpen, Play, ChevronDown } from 'lucide-react';
 import { Lesson } from '../types';
 
 interface DailyChallengeHubProps {
-  onSelectChallenge: (type: 'listening' | 'speaking' | 'writing', scenario?: { context: string, user: string }) => void;
+  onSelectChallenge: (type: 'listening' | 'speaking' | 'writing', scenario?: { context: string, user: string, multiplier?: number }) => void;
   onClose: () => void;
   lessons: Lesson[];
   unlockedLessonIds: string[];
 }
 
 const DailyChallengeHub: React.FC<DailyChallengeHubProps> = ({ onSelectChallenge, onClose, lessons, unlockedLessonIds }) => {
-  
-  const handleSpeakingCombat = () => {
-    // 1. Lọc kịch bản chỉ sử dụng thông tin từ các bài học đã có trong unlockedLessons
-    // Mặc định luôn có bài 1 và 2 là bài free
-    const freeLessonIds = lessons.slice(0, 2).map(l => l.id);
-    const availableLessonIds = Array.from(new Set([...freeLessonIds, ...unlockedLessonIds]));
-    
-    const availableLessons = lessons.filter(l => availableLessonIds.includes(l.id));
-    
-    if (availableLessons.length === 0) {
-      alert("Hệ thống bài học đang gặp sự cố. Vui lòng thử lại sau!");
-      return;
-    }
+  const [showCombatOptions, setShowCombatOptions] = useState(false);
+  const [selectedTopicId, setSelectedTopicId] = useState<string>("");
 
-    // 2. Chọn ngẫu nhiên kịch bản từ các bài đã mở
+  const availableLessons = lessons.filter(l => l.order <= 2 || unlockedLessonIds.includes(l.id));
+
+  const handleRandomCombat = () => {
+    if (availableLessons.length === 0) return;
     const randomLesson = availableLessons[Math.floor(Math.random() * availableLessons.length)];
-    
     onSelectChallenge('speaking', {
       context: randomLesson.roleplay.ai_instructions,
-      user: randomLesson.roleplay.user_instructions
+      user: randomLesson.roleplay.user_instructions,
+      multiplier: 2.0 // Điểm thưởng ngẫu nhiên x2
     });
   };
+
+  const handleTopicCombat = () => {
+    const selectedLesson = availableLessons.find(l => l.id === selectedTopicId);
+    if (!selectedLesson) {
+      alert("Vui lòng chọn một chủ đề!");
+      return;
+    }
+    onSelectChallenge('speaking', {
+      context: selectedLesson.roleplay.ai_instructions,
+      user: selectedLesson.roleplay.user_instructions,
+      multiplier: 1.5 // Điểm thưởng theo chủ đề x1.5
+    });
+  };
+
+  if (showCombatOptions) {
+    return (
+      <div className="h-full flex flex-col bg-app-bg animate-fade-in p-6 pb-24">
+        <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => setShowCombatOptions(false)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-400">
+            <ChevronRight className="rotate-180" size={24} />
+          </button>
+          <h2 className="text-xl font-black text-app-text">Cấu hình Thực chiến</h2>
+        </div>
+
+        <div className="space-y-6">
+          {/* Option: Random */}
+          <button 
+            onClick={handleRandomCombat}
+            className="w-full bg-white p-6 rounded-[32px] soft-shadow border-2 border-transparent hover:border-indigo-500 transition-all flex items-center gap-5 text-left group active:scale-[0.98]"
+          >
+            <div className="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+              <Shuffle size={32} />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="text-base font-black text-app-text">Ngẫu nhiên</h4>
+                <span className="bg-amber-400 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Hot</span>
+              </div>
+              <p className="text-xs text-slate-400 font-bold italic">Thử thách từ các bài đã học.</p>
+              <div className="mt-2 text-xs font-black text-indigo-500">THƯỞNG X2.0 PTS</div>
+            </div>
+          </button>
+
+          <div className="flex items-center gap-4 py-2">
+            <div className="flex-1 h-px bg-slate-200"></div>
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hoặc chọn theo chủ đề</span>
+            <div className="flex-1 h-px bg-slate-200"></div>
+          </div>
+
+          {/* Option: Topic selection */}
+          <div className="bg-white p-6 rounded-[32px] soft-shadow border border-slate-100">
+            <div className="flex items-center gap-4 mb-6">
+               <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center">
+                 <BookOpen size={24} />
+               </div>
+               <div className="flex-1">
+                 <h4 className="text-sm font-black text-app-text">Chọn chủ đề cụ thể</h4>
+                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Thưởng x1.5 PTS</p>
+               </div>
+            </div>
+
+            <div className="relative mb-6">
+              <select 
+                value={selectedTopicId}
+                onChange={(e) => setSelectedTopicId(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-black text-app-text appearance-none focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+              >
+                <option value="" disabled>--- Chọn chủ đề thực chiến ---</option>
+                {availableLessons.map(l => (
+                  <option key={l.id} value={l.id}>Bài {l.order}: {l.title}</option>
+                ))}
+              </select>
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <ChevronDown size={18} />
+              </div>
+            </div>
+
+            <button 
+              onClick={handleTopicCombat}
+              disabled={!selectedTopicId}
+              className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg transition-all active:scale-95 ${selectedTopicId ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-slate-100 text-slate-300 shadow-none'}`}
+            >
+              <Play size={18} fill="currentColor" /> BẮT ĐẦU THỰC CHIẾN
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col bg-app-bg overflow-y-auto no-scrollbar p-6 pb-24">
@@ -70,7 +152,7 @@ const DailyChallengeHub: React.FC<DailyChallengeHubProps> = ({ onSelectChallenge
 
         {/* Speaking Challenge (COMBAT) */}
         <button 
-          onClick={handleSpeakingCombat}
+          onClick={() => setShowCombatOptions(true)}
           className="w-full bg-white p-6 rounded-[32px] soft-shadow border border-slate-100 flex items-center gap-5 text-left group active:scale-[0.98] transition-all"
         >
           <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
@@ -80,7 +162,7 @@ const DailyChallengeHub: React.FC<DailyChallengeHubProps> = ({ onSelectChallenge
             <div className="flex items-center gap-2 mb-1.5">
                <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest">Kỹ năng Nói</span>
                <div className="flex items-center gap-0.5 bg-indigo-500 px-2 py-0.5 rounded-lg text-[8px] font-black text-white shadow-sm">
-                 X2.5 PTS
+                 Bonus Up to x2.0
                </div>
             </div>
             <h4 className="text-base font-black text-app-text truncate">AI Roleplay Combat</h4>
