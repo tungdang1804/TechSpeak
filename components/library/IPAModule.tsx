@@ -12,7 +12,8 @@ const IPAModule: React.FC = () => {
   const diphthongs = useMemo(() => IPA_SOUNDS.filter(s => s.type === 'diphthong'), []);
   const consonants = useMemo(() => IPA_SOUNDS.filter(s => s.type === 'consonant'), []);
 
-  const IPACell = ({ sound }: { sound: IPASound }) => (
+  // Added key property to the type definition to avoid TS error during mapping in the JSX return
+  const IPACell = ({ sound }: { sound: IPASound, key?: React.Key }) => (
     <button 
       onClick={() => setSelectedIPASound(sound)}
       className={`aspect-square rounded-2xl border flex flex-col items-center justify-center transition-all active:scale-95 group relative overflow-hidden ${selectedIPASound?.symbol === sound.symbol ? 'bg-app-primary text-white border-transparent shadow-lg' : 'bg-white text-app-text border-slate-100 shadow-sm'}`}

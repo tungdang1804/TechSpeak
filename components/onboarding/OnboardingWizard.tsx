@@ -19,9 +19,10 @@ interface OnboardingWizardProps {
 
 const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user }) => {
   const [step, setStep] = useState(1);
-  const [gender, setGender] = useState<'male' | 'female'>(user.avatarConfig.gender);
-  const [name, setName] = useState(user.displayName);
-  const [industry, setIndustry] = useState(user.primaryIndustry);
+  // Thêm optional chaining và fallback
+  const [gender, setGender] = useState<'male' | 'female'>(user?.avatarConfig?.gender || 'female');
+  const [name, setName] = useState(user?.displayName || '');
+  const [industry, setIndustry] = useState(user?.primaryIndustry || 'nails');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const INDUSTRIES = [
@@ -95,7 +96,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user }) => {
         {step === 2 && (
           <div className="flex-1 flex flex-col animate-fade-in">
             <h2 className="text-3xl font-black text-app-text mb-2 leading-tight">Bạn tên là gì?</h2>
-            <p className="text-sm text-slate-400 font-bold mb-12">Chúng tôi sẽ dùng tên này để AI gọi bạn trong các tình huống thực chiến.</p>
+            <p className="text-sm text-slate-400 font-bold mb-12">Chúng sẽ dùng tên này để AI gọi bạn trong các tình huống thực chiến.</p>
             
             <div className="relative">
               <User className="absolute left-6 top-1/2 -translate-y-1/2 text-app-primary" size={24} />

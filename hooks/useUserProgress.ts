@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { User } from 'firebase/auth';
 import { 

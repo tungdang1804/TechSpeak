@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 
 export const useAuthForm = (onSubmit: (data: any) => Promise<void>) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -28,6 +28,7 @@ export const useAuthForm = (onSubmit: (data: any) => Promise<void>) => {
     return true;
   };
 
+  // Fixed React namespace error by importing React
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;

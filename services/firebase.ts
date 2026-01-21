@@ -1,5 +1,4 @@
-
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -14,8 +13,7 @@ const firebaseConfig = {
   measurementId: "G-GM295V6M29"
 };
 
-// Khởi tạo Firebase theo chuẩn Modular (v9+)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);

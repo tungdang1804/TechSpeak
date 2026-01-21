@@ -1,10 +1,5 @@
-
 import { increment, arrayUnion } from "firebase/firestore";
 import { updateProfileData } from "./profile";
-
-/**
- * Quản lý Điểm và Hạn mức AI
- */
 
 export const awardPoints = async (uid: string, amount: number, reason: string) => {
   await updateProfileData(uid, {

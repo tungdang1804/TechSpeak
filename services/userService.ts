@@ -1,14 +1,7 @@
-
-/**
- * User Service (Facade)
- * Điểm tập trung duy nhất để quản lý User State & Business Logic
- */
-
 import { doc, updateDoc, arrayUnion, increment } from "firebase/firestore";
 import { db } from "./firebase";
 import { SavedPattern, UserProfile } from "../types";
 
-// Re-export UserProfile for components that import it from here
 export type { UserProfile };
 
 export { 
@@ -24,7 +17,6 @@ export {
   calculateStarLevel
 } from "./user/economy";
 
-// Inventory & Library logic
 export const saveToLibraryVocab = async (uid: string, vocabId: string) => {
   const userRef = doc(db, "users", uid);
   await updateDoc(userRef, { userVocabulary: arrayUnion(vocabId) });
@@ -44,16 +36,8 @@ export const unlockContent = async (uid: string, type: 'lesson' | 'industry', co
   return { success: true, message: "Mở khóa thành công!" };
 };
 
-/**
- * Fix: Missing export clearProfileCache used in authService.ts
- */
-export const clearProfileCache = () => {
-  // Logic to clear local profile cache if any
-};
+export const clearProfileCache = () => {};
 
-/**
- * Fix: Missing export resetAdminProfile used in useUserProgress.ts
- */
 export const resetAdminProfile = async (uid: string, mode: 'reset' | 'test') => {
   const userRef = doc(db, "users", uid);
   if (mode === 'reset') {

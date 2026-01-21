@@ -1,4 +1,3 @@
-
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { UserProfile } from "../../types";
@@ -28,14 +27,22 @@ export const getInitialProfile = (uid: string): UserProfile => ({
 export const fetchProfile = async (uid: string): Promise<UserProfile> => {
   const userRef = doc(db, "users", uid);
   const userSnap = await getDoc(userRef);
+  const initial = getInitialProfile(uid);
   
   if (!userSnap.exists()) {
-    const newProfile = getInitialProfile(uid);
-    await setDoc(userRef, newProfile);
-    return newProfile;
+    await setDoc(userRef, initial);
+    return initial;
   }
   
-  return { ...getInitialProfile(uid), ...userSnap.data() } as UserProfile;
+  const data = userSnap.data() || {};
+  return { 
+    ...initial, 
+    ...data,
+    avatarConfig: {
+      ...initial.avatarConfig,
+      ...(data.avatarConfig || {})
+    }
+  } as UserProfile;
 };
 
 export const updateProfileData = async (uid: string, updates: Partial<UserProfile>) => {
@@ -44,7 +51,19 @@ export const updateProfileData = async (uid: string, updates: Partial<UserProfil
 };
 
 export const watchProfile = (uid: string, callback: (p: UserProfile) => void) => {
-  return onSnapshot(doc(db, "users", uid), (snap) => {
-    if (snap.exists()) callback(snap.data() as UserProfile);
+  const userRef = doc(db, "users", uid);
+  return onSnapshot(userRef, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data() || {};
+      const initial = getInitialProfile(uid);
+      callback({
+        ...initial,
+        ...data,
+        avatarConfig: {
+          ...initial.avatarConfig,
+          ...(data.avatarConfig || {})
+        }
+      } as UserProfile);
+    }
   });
 };

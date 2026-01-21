@@ -1,23 +1,19 @@
-
 import { 
   signInAnonymously, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
+  EmailAuthProvider, 
   linkWithCredential, 
-  linkWithPopup,
-  EmailAuthProvider,
-  updateProfile,
-  User
+  updateProfile, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut,
+  User,
+  linkWithPopup
 } from "firebase/auth";
 import { auth } from "./firebase";
 import { clearProfileCache } from "./userService";
 
-/**
- * Đăng nhập ẩn danh
- */
 export const loginAnonymously = async () => {
   try {
     const userCredential = await signInAnonymously(auth);
@@ -28,9 +24,6 @@ export const loginAnonymously = async () => {
   }
 };
 
-/**
- * Nâng cấp tài khoản ẩn danh bằng Email/Password
- */
 export const upgradeAccount = async (email: string, password: string, displayName: string) => {
   const user = auth.currentUser;
   if (!user) throw new Error("No user logged in");
@@ -51,9 +44,6 @@ export const upgradeAccount = async (email: string, password: string, displayNam
   }
 };
 
-/**
- * Đăng nhập hoặc Liên kết bằng Google
- */
 export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
@@ -78,24 +68,15 @@ export const signInWithGoogle = async () => {
   }
 };
 
-/**
- * Đăng nhập bằng Email
- */
 export const loginWithEmail = async (email: string, password: string) => {
   const userCredential = await signInWithEmailAndPassword(auth, email, password);
   return userCredential.user;
 };
 
-/**
- * Lắng nghe thay đổi trạng thái đăng nhập
- */
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
 
-/**
- * Đăng xuất và dọn dẹp
- */
 export const logout = async () => {
   try {
     clearProfileCache();
