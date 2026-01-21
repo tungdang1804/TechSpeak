@@ -8,12 +8,11 @@ import { Volume2, X, Info } from 'lucide-react';
 const IPAModule: React.FC = () => {
   const [selectedIPASound, setSelectedIPASound] = useState<IPASound | null>(null);
 
-  // Phân loại các âm tiết
   const vowels = useMemo(() => IPA_SOUNDS.filter(s => s.type === 'vowel'), []);
   const diphthongs = useMemo(() => IPA_SOUNDS.filter(s => s.type === 'diphthong'), []);
   const consonants = useMemo(() => IPA_SOUNDS.filter(s => s.type === 'consonant'), []);
 
-  const IPACell = ({ sound, colorClass }: { sound: IPASound, colorClass: string }) => (
+  const IPACell = ({ sound }: { sound: IPASound }) => (
     <button 
       onClick={() => setSelectedIPASound(sound)}
       className={`aspect-square rounded-2xl border flex flex-col items-center justify-center transition-all active:scale-95 group relative overflow-hidden ${selectedIPASound?.symbol === sound.symbol ? 'bg-app-primary text-white border-transparent shadow-lg' : 'bg-white text-app-text border-slate-100 shadow-sm'}`}
@@ -22,64 +21,55 @@ const IPAModule: React.FC = () => {
       <span className={`text-[8px] font-bold uppercase opacity-60 mt-1 ${selectedIPASound?.symbol === sound.symbol ? 'text-white/80' : 'text-slate-400'}`}>
         {sound.examples[0].word}
       </span>
-      {selectedIPASound?.symbol === sound.symbol && (
-        <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-white rounded-full"></div>
-      )}
     </button>
   );
 
   return (
     <div className="flex-1 overflow-y-auto no-scrollbar px-5 pb-32 animate-fade-in pt-2">
-      {/* Monophthongs Section */}
       <div className="mb-8">
         <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-          <div className="w-1.5 h-4 bg-teal-400 rounded-full"></div> Nguyên âm đơn (Monophthongs)
+          <div className="w-1.5 h-4 bg-teal-400 rounded-full"></div> Nguyên âm đơn
         </h4>
         <div className="grid grid-cols-4 gap-3">
-          {vowels.map((s, i) => <IPACell key={i} sound={s} colorClass="bg-teal-500" />)}
+          {vowels.map((s, i) => <IPACell key={i} sound={s} />)}
         </div>
       </div>
 
-      {/* Diphthongs Section */}
       <div className="mb-8">
         <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-          <div className="w-1.5 h-4 bg-indigo-400 rounded-full"></div> Nguyên âm đôi (Diphthongs)
+          <div className="w-1.5 h-4 bg-indigo-400 rounded-full"></div> Nguyên âm đôi
         </h4>
         <div className="grid grid-cols-4 gap-3">
-          {diphthongs.map((s, i) => <IPACell key={i} sound={s} colorClass="bg-indigo-500" />)}
+          {diphthongs.map((s, i) => <IPACell key={i} sound={s} />)}
         </div>
       </div>
 
-      {/* Consonants Section */}
       <div className="mb-8">
         <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-          <div className="w-1.5 h-4 bg-rose-400 rounded-full"></div> Phụ âm (Consonants)
+          <div className="w-1.5 h-4 bg-rose-400 rounded-full"></div> Phụ âm
         </h4>
         <div className="grid grid-cols-4 gap-3">
-          {consonants.map((s, i) => <IPACell key={i} sound={s} colorClass="bg-rose-400" />)}
+          {consonants.map((s, i) => <IPACell key={i} sound={s} />)}
         </div>
       </div>
 
-      {/* FIXED POSITION MODAL: Higher placement and more compact */}
       {selectedIPASound && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center p-6 pt-[10dvh] animate-fade-in">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setSelectedIPASound(null)}></div>
-          <div className="bg-white w-full max-w-[340px] rounded-[32px] shadow-2xl relative animate-slide-up-modal flex flex-col max-h-[70dvh] overflow-hidden border border-slate-100">
+          <div className="bg-white w-full max-w-[340px] rounded-[32px] shadow-2xl relative animate-slide-up-modal flex flex-col max-h-[85dvh] overflow-hidden border border-slate-100">
             
-            {/* Modal Header - Minimal */}
             <div className="px-6 pt-5 pb-2 shrink-0 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 bg-app-primary/10 text-app-primary rounded-lg flex items-center justify-center">
                   <Info size={14} />
                 </div>
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Chi tiết âm tiết</h3>
+                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Phòng Lab Phát Âm</h3>
               </div>
               <button onClick={() => setSelectedIPASound(null)} className="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-400 rounded-full active:scale-90 transition-all">
                 <X size={16} />
               </button>
             </div>
             
-            {/* Modal Body - Optimized spacing */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 pb-4">
               <div className="flex flex-col items-center mb-5 pt-2">
                 <div className="w-16 h-16 bg-app-primary text-white rounded-[20px] flex items-center justify-center text-3xl font-black italic mb-3 shadow-lg shadow-app-primary/20">
@@ -92,6 +82,7 @@ const IPAModule: React.FC = () => {
               </div>
 
               <div className="space-y-2">
+                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest text-center mb-1">Ví dụ thực tế</p>
                 {selectedIPASound.examples.map((ex, i) => (
                   <div key={i} className="bg-slate-50 p-3 rounded-2xl flex items-center justify-between border border-slate-100">
                     <div className="text-left">
@@ -109,13 +100,12 @@ const IPAModule: React.FC = () => {
               </div>
             </div>
 
-            {/* Modal Footer - Strong Call to Action */}
             <div className="px-6 pb-6 pt-3 bg-white border-t border-slate-50 shrink-0">
               <button 
                 onClick={() => playAudio(selectedIPASound.symbol, 'phonetic')}
-                className="w-full py-3.5 bg-app-primary text-white rounded-xl font-black shadow-lg shadow-app-primary/10 flex items-center justify-center gap-2 active:scale-95 transition-all uppercase text-[10px] tracking-widest"
+                className="w-full py-4 bg-app-primary text-white rounded-2xl font-black shadow-lg shadow-app-primary/10 flex items-center justify-center gap-2 active:scale-95 transition-all uppercase text-[10px] tracking-widest"
               >
-                <Volume2 size={16} fill="currentColor" /> NGHE ÂM TIẾT
+                <Volume2 size={18} fill="currentColor" /> NGHE ÂM TIẾT
               </button>
             </div>
           </div>

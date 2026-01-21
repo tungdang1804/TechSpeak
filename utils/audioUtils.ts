@@ -10,11 +10,76 @@ export const VOICE_MODELS = {
 };
 
 let currentGender: VoiceGender = (localStorage.getItem('voiceGender') as VoiceGender) || 'female';
-const audioBufferCache = new Map<string, AudioBuffer>();
 
-// Hàng đợi xử lý yêu cầu để tránh lỗi 429
+// --- CẤU HÌNH INDEXEDDB (PERSISTENT CACHE) ---
+const DB_NAME = 'TechSpeakAudioDB';
+const STORE_NAME = 'audio_blobs';
+const DB_VERSION = 1;
+
+const openDB = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+const getCache = async (key: string): Promise<Uint8Array | null> => {
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(key);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => resolve(null);
+    });
+  } catch { return null; }
+};
+
+const setCache = async (key: string, data: Uint8Array): Promise<void> => {
+  try {
+    const db = await openDB();
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    store.put(data, key);
+  } catch (e) { console.error("Save to IndexedDB failed", e); }
+};
+
+// --- HÀNG ĐỢI REQUEST THROTTLING ---
 const requestQueue: (() => Promise<any>)[] = [];
 let isProcessingQueue = false;
+let globalThrottleUntil = 0;
+const MIN_GAP_MS = 500; // Khoảng nghỉ 0.5s giữa các request thành công
+
+const processQueue = async () => {
+  if (isProcessingQueue || requestQueue.length === 0) return;
+  isProcessingQueue = true;
+  
+  while (requestQueue.length > 0) {
+    const now = Date.now();
+    if (now < globalThrottleUntil) {
+      await new Promise(r => setTimeout(r, globalThrottleUntil - now));
+    }
+
+    const task = requestQueue.shift();
+    if (task) {
+      try {
+        await task();
+        globalThrottleUntil = Date.now() + MIN_GAP_MS;
+      } catch (e) {
+        console.error("Queue task failed", e);
+      }
+    }
+  }
+  isProcessingQueue = false;
+};
 
 let activeAudioSource: AudioBufferSourceNode | null = null;
 let activeAudioContext: AudioContext | null = null;
@@ -41,7 +106,6 @@ export const stopAllAudio = () => {
 export const setVoicePreference = (gender: VoiceGender) => {
   currentGender = gender;
   localStorage.setItem('voiceGender', gender);
-  audioBufferCache.clear();
 };
 
 export const getVoicePreference = (): VoiceGender => currentGender;
@@ -67,9 +131,9 @@ export async function decodeAudioData(
   for (let channel = 0; channel < numChannels; channel++) {
     const channelData = audioBuffer.getChannelData(channel);
     for (let i = 0; i < frameCount; i++) {
-      // Chuyển đổi chuẩn xác từ Int16 sang Float32
       const val = bufferView[i * numChannels + channel];
-      channelData[i] = val / 32768.0;
+      // Hiệu chỉnh giải mã để tránh nhiễu
+      channelData[i] = val < 0 ? val / 32768.0 : val / 32767.0;
     }
   }
   return audioBuffer;
@@ -96,32 +160,20 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-// Hàm xử lý hàng đợi để tránh spam API
-const processQueue = async () => {
-  if (isProcessingQueue || requestQueue.length === 0) return;
-  isProcessingQueue = true;
-  
-  while (requestQueue.length > 0) {
-    const task = requestQueue.shift();
-    if (task) {
-      await task();
-      // Nghỉ 500ms giữa các lần gọi để tránh 429
-      await new Promise(r => setTimeout(r, 500));
-    }
-  }
-  
-  isProcessingQueue = false;
-};
-
-export const preloadAudio = async (text: string, context: SpeechContext = 'normal', retryCount = 0) => {
+export const preloadAudio = async (text: string, context: SpeechContext = 'normal', retryCount = 0): Promise<boolean> => {
   const voiceName = currentGender === 'female' ? VOICE_MODELS.female.voiceId : VOICE_MODELS.male.voiceId;
   const cacheKey = `${voiceName}_${text}_${context}`;
   
-  if (audioBufferCache.has(cacheKey)) return;
+  // Kiểm tra IndexedDB trước
+  const cachedData = await getCache(cacheKey);
+  if (cachedData) return true;
 
   return new Promise((resolve) => {
     requestQueue.push(async () => {
-      const ctx = getAudioContext();
+      // Kiểm tra lại lần nữa trong queue
+      const dataAgain = await getCache(cacheKey);
+      if (dataAgain) { resolve(true); return; }
+
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const prompt = wrapSSML(text, context);
 
@@ -139,22 +191,20 @@ export const preloadAudio = async (text: string, context: SpeechContext = 'norma
 
         const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
         if (base64Audio) {
-          const audioBuffer = await decodeAudioData(decodeBase64(base64Audio), ctx);
-          audioBufferCache.set(cacheKey, audioBuffer);
+          const uint8 = decodeBase64(base64Audio);
+          await setCache(cacheKey, uint8);
           resolve(true);
         } else {
           resolve(false);
         }
       } catch (error: any) {
-        // Xử lý lỗi 429: Thử lại sau 2 giây
-        if ((error?.status === 429 || error?.message?.includes('429')) && retryCount < 3) {
-          console.warn(`429 detected for "${text}", retrying in 2s...`);
-          await new Promise(r => setTimeout(r, 2000));
-          await preloadAudio(text, context, retryCount + 1);
+        const isRateLimit = error?.status === 429 || error?.message?.includes('429');
+        if (isRateLimit && retryCount < 2) {
+          globalThrottleUntil = Date.now() + 5000; // Tạm dừng 5s khi bị rate limit
+          setTimeout(() => preloadAudio(text, context, retryCount + 1).then(resolve), 5000);
         } else {
-          console.error("TTS failed for:", text, error);
+          resolve(false);
         }
-        resolve(false);
       }
     });
     processQueue();
@@ -169,12 +219,11 @@ export const playAudio = async (text: string, context: SpeechContext = 'normal')
   currentPlayingKey = cacheKey;
 
   const ctx = getAudioContext();
-  if (ctx.state === 'suspended') {
-    await ctx.resume();
-  }
+  if (ctx.state === 'suspended') await ctx.resume();
 
-  const playFromBuffer = (buffer: AudioBuffer) => {
+  const playData = async (data: Uint8Array) => {
     if (currentPlayingKey !== cacheKey) return;
+    const buffer = await decodeAudioData(data, ctx);
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.connect(ctx.destination);
@@ -188,13 +237,12 @@ export const playAudio = async (text: string, context: SpeechContext = 'normal')
     });
   };
 
-  if (audioBufferCache.has(cacheKey)) {
-    return playFromBuffer(audioBufferCache.get(cacheKey)!);
-  }
+  const cached = await getCache(cacheKey);
+  if (cached) return playData(cached);
 
-  // Load và phát ngay khi xong
-  await preloadAudio(text, context);
-  if (audioBufferCache.has(cacheKey)) {
-    return playFromBuffer(audioBufferCache.get(cacheKey)!);
+  const success = await preloadAudio(text, context);
+  if (success) {
+    const freshData = await getCache(cacheKey);
+    if (freshData) return playData(freshData);
   }
 };
