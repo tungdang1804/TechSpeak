@@ -8,6 +8,7 @@ import { useAppNavigation } from './hooks/useAppNavigation';
 import { Home, BookOpen, Library as LibraryIcon, User as UserIcon, X, Trophy } from 'lucide-react';
 import { auth } from './services/firebase';
 import MainHeader from './components/layout/MainHeader';
+import OnboardingWizard from './components/onboarding/OnboardingWizard';
 
 // Lazy loading components
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -53,6 +54,11 @@ function App() {
   }, [userProfile, isGuest]);
 
   if (isLoading || !userProfile) return <LoadingOverlay />;
+
+  // Trigger Onboarding if not complete
+  if (!userProfile.onboardingComplete) {
+    return <OnboardingWizard user={userProfile} />;
+  }
 
   return (
     <div className="app-container shadow-2xl border-x border-slate-100 flex flex-col font-sans">

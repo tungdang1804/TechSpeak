@@ -1,7 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { User } from 'firebase/auth';
-import { auth } from '../services/firebase';
 import { 
   getUserProfile, 
   subscribeToProfile, 
@@ -31,7 +30,6 @@ export const useUserProgress = () => {
             setUserProfile(profile);
             setIsLoading(false);
             
-            // Xử lý subscribe profile thời gian thực
             if (profileUnsubRef.current) profileUnsubRef.current();
             profileUnsubRef.current = subscribeToProfile(user.uid, (p) => {
               if (isMounted) setUserProfile(p);
@@ -41,10 +39,8 @@ export const useUserProgress = () => {
           if (isMounted) setIsLoading(false);
         }
       } else {
-        // Tự động đăng nhập ẩn danh cho khách hàng mới
         try {
           await loginAnonymously();
-          // Quá trình này sẽ kích hoạt lại subscribeToAuthChanges với user mới
         } catch (e) {
           if (isMounted) setIsLoading(false);
         }
@@ -81,8 +77,7 @@ export const useUserProgress = () => {
 
   const adminAction = async (mode: 'reset' | 'test') => {
     if (!userProfile?.isAdmin) return;
-    const updates = await resetAdminProfile(userProfile.uid, mode);
-    // Profile sẽ tự cập nhật thông qua subscription
+    await resetAdminProfile(userProfile.uid, mode);
   };
 
   return {

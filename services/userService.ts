@@ -6,7 +6,8 @@ import {
   updateDoc, 
   onSnapshot,
   arrayUnion,
-  increment
+  increment,
+  FieldValue
 } from "firebase/firestore";
 import { db, auth } from "./firebase";
 import { UserProgress } from "../types";
@@ -29,19 +30,28 @@ export interface SavedPattern {
   timestamp: string;
 }
 
+export interface AvatarConfig {
+  gender: 'male' | 'female';
+  baseId: string;
+  items: string[];
+}
+
 export interface UserProfile extends UserProgress {
   uid: string;
-  lastDailyReset: string;
-  usageCount: number;
-  email?: string;
   displayName: string;
+  email?: string;
   photoURL?: string;
   points: number;
   starLevel: number;
+  onboardingComplete: boolean;
+  primaryIndustry: 'nails' | 'bartender' | 'flooring' | 'mechanic';
+  avatarConfig: AvatarConfig;
+  lastDailyReset: string;
+  usageCount: number;
   unlockedIndustries: string[];
   unlockedLessons: string[];
-  userVocabulary: string[]; // Mảng ID từ vựng đã lưu
-  userGrammar: SavedPattern[]; // Mảng mẫu câu đã lưu
+  userVocabulary: string[];
+  userGrammar: SavedPattern[];
   pointHistory: PointTransaction[];
   isAdmin?: boolean;
 }
@@ -54,18 +64,6 @@ export const clearProfileCache = () => {
   profileCache = {};
 };
 
-const calculateStarLevel = (data: Partial<UserProfile>): number => {
-  if (data.uid === ADMIN_UID || data.isAdmin) return 5;
-  const points = data.points || 0;
-  const completedLessons = data.completedLessons || [];
-  if (points >= 10000 && completedLessons.length >= 5) return 5;
-  if (points >= 7000) return 4;
-  if (points >= 5000) return 3;
-  if (completedLessons.length >= 3) return 2;
-  if (completedLessons.length >= 1) return 1;
-  return 0;
-};
-
 export const getUserProfile = async (uid: string): Promise<UserProfile> => {
   if (!uid) throw new Error("UID is required");
   const today = getTodayString();
@@ -74,9 +72,17 @@ export const getUserProfile = async (uid: string): Promise<UserProfile> => {
 
   const defaultProfile: UserProfile = {
     uid: uid,
+    displayName: isAdmin ? "Đặng Thanh Tùng" : (auth.currentUser?.displayName ?? "Star Artist"),
     completedLessons: [],
     unlockedLessons: [],
     bestScores: {},
+    onboardingComplete: false,
+    primaryIndustry: 'nails',
+    avatarConfig: {
+      gender: 'female',
+      baseId: 'base_01',
+      items: []
+    },
     lastDailyReset: today,
     usageCount: 0,
     points: isAdmin ? 999999 : 0,
@@ -85,8 +91,7 @@ export const getUserProfile = async (uid: string): Promise<UserProfile> => {
     userVocabulary: [],
     userGrammar: [],
     pointHistory: [],
-    isAdmin: isAdmin,
-    displayName: isAdmin ? "Đặng Thanh Tùng" : (auth.currentUser?.displayName ?? "Học viên Star")
+    isAdmin: isAdmin
   };
 
   try {
@@ -112,26 +117,9 @@ export const getUserProfile = async (uid: string): Promise<UserProfile> => {
   }
 };
 
-export const saveToLibraryVocab = async (uid: string, vocabId: string) => {
+export const updateProgress = async (uid: string, updates: Partial<UserProfile>) => {
   const userRef = doc(db, "users", uid);
-  await updateDoc(userRef, { userVocabulary: arrayUnion(vocabId) });
-};
-
-export const saveToLibraryGrammar = async (uid: string, pattern: SavedPattern) => {
-  const userRef = doc(db, "users", uid);
-  await updateDoc(userRef, { userGrammar: arrayUnion(pattern) });
-};
-
-export const subscribeToProfile = (uid: string, callback: (profile: UserProfile) => void) => {
-  if (!uid) return () => {};
-  const userRef = doc(db, "users", uid);
-  return onSnapshot(userRef, (doc) => {
-    if (doc.exists()) {
-      const data = doc.data() as UserProfile;
-      profileCache[uid] = { ...profileCache[uid], ...data };
-      callback(profileCache[uid]);
-    }
-  });
+  await updateDoc(userRef, updates);
 };
 
 export const addPoints = async (uid: string, amount: number, reason: string) => {
@@ -142,7 +130,16 @@ export const addPoints = async (uid: string, amount: number, reason: string) => 
   });
 };
 
-// Fix: Add message to return object to match union type in tryUnlock
+export const saveToLibraryVocab = async (uid: string, vocabId: string) => {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, { userVocabulary: arrayUnion(vocabId) });
+};
+
+export const saveToLibraryGrammar = async (uid: string, pattern: SavedPattern) => {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, { userGrammar: arrayUnion(pattern) });
+};
+
 export const unlockContent = async (uid: string, type: 'lesson' | 'industry', contentId: string, cost: number) => {
   const userRef = doc(db, "users", uid);
   await updateDoc(userRef, {
@@ -157,13 +154,19 @@ export const incrementAIUsage = async (uid: string) => {
   await updateDoc(userRef, { usageCount: increment(1) });
 };
 
-// Fix: Export updateProgress as it is used in useUserProgress.ts
-export const updateProgress = async (uid: string, updates: Partial<UserProfile>) => {
+export const subscribeToProfile = (uid: string, callback: (profile: UserProfile) => void) => {
+  if (!uid) return () => {};
   const userRef = doc(db, "users", uid);
-  await updateDoc(userRef, updates);
+  return onSnapshot(userRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data() as UserProfile;
+      const merged = { ...profileCache[uid], ...data };
+      profileCache[uid] = merged;
+      callback(merged);
+    }
+  });
 };
 
-// Fix: Export resetAdminProfile as it is used in useUserProgress.ts
 export const resetAdminProfile = async (uid: string, mode: 'reset' | 'test') => {
   const userRef = doc(db, "users", uid);
   if (mode === 'reset') {
@@ -174,7 +177,8 @@ export const resetAdminProfile = async (uid: string, mode: 'reset' | 'test') => 
       bestScores: {},
       points: 999999,
       usageCount: 0,
-      lastDailyReset: today
+      lastDailyReset: today,
+      onboardingComplete: true
     });
   }
   return { success: true };

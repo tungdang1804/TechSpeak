@@ -32,9 +32,10 @@ const Dashboard: React.FC<DashboardProps> = ({ lessons, onSelectLesson, onSelect
     : 0;
 
   const INDUSTRIES = [
-    { id: 'nails', name: 'Nail Spa', emoji: '💅', status: 'available' },
-    { id: 'massage', name: 'Body Massage', emoji: '💆', status: 'coming_soon' },
-    { id: 'skincare', name: 'Skin Care', emoji: '🧴', status: 'coming_soon' },
+    { id: 'nails', name: 'Nail & Spa', emoji: '💅', status: 'available' },
+    { id: 'bartender', name: 'Bartender', emoji: '🍷', status: 'coming_soon' },
+    { id: 'flooring', name: 'Xây dựng', emoji: '🔨', status: 'coming_soon' },
+    { id: 'mechanic', name: 'Cơ khí', emoji: '🔧', status: 'coming_soon' },
   ];
 
   // Hiển thị +9999 cho điểm lớn
@@ -51,7 +52,7 @@ const Dashboard: React.FC<DashboardProps> = ({ lessons, onSelectLesson, onSelect
                 Level: {progress.isAdmin ? "Administrator" : "Apprentice"}
               </span>
             </div>
-            <h2 className="text-3xl font-black mb-6 leading-[1.1] tracking-tight">Chào mừng trở lại,<br/>{progress.isAdmin ? "Mr. Tùng" : "Star Artist!"}</h2>
+            <h2 className="text-3xl font-black mb-6 leading-[1.1] tracking-tight">Chào mừng trở lại,<br/>{progress.displayName.split(' ')[0]}!</h2>
             <div className="flex items-center gap-4">
               <div className="flex-1 bg-black/10 h-2 rounded-full overflow-hidden backdrop-blur-sm">
                 <div 

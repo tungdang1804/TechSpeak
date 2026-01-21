@@ -1,16 +1,16 @@
 
 import { 
   signInAnonymously, 
+  signInWithEmailAndPassword, 
+  signOut, 
   onAuthStateChanged, 
-  User,
-  signInWithEmailAndPassword,
-  signOut,
-  EmailAuthProvider,
-  linkWithCredential,
-  updateProfile,
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  linkWithCredential, 
   linkWithPopup,
-  GoogleAuthProvider,
-  signInWithPopup
+  EmailAuthProvider,
+  updateProfile,
+  User
 } from "firebase/auth";
 import { auth } from "./firebase";
 import { clearProfileCache } from "./userService";
@@ -39,7 +39,9 @@ export const upgradeAccount = async (email: string, password: string, displayNam
   
   try {
     const userCredential = await linkWithCredential(user, credential);
-    await updateProfile(userCredential.user, { displayName });
+    if (userCredential.user) {
+      await updateProfile(userCredential.user, { displayName });
+    }
     return userCredential.user;
   } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {
@@ -55,13 +57,11 @@ export const upgradeAccount = async (email: string, password: string, displayNam
 export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
-    // Nếu đang là khách (anonymous), thử liên kết tài khoản
     if (auth.currentUser && auth.currentUser.isAnonymous) {
       try {
         const userCredential = await linkWithPopup(auth.currentUser, provider);
         return userCredential.user;
       } catch (linkError: any) {
-        // Nếu tài khoản Google đã tồn tại ở một project khác, thực hiện đăng nhập bình thường
         if (linkError.code === 'auth/credential-already-in-use' || linkError.code === 'auth/email-already-in-use') {
           const userCredential = await signInWithPopup(auth, provider);
           return userCredential.user;
@@ -69,7 +69,6 @@ export const signInWithGoogle = async () => {
         throw linkError;
       }
     } else {
-      // Nếu chưa có user hoặc không phải anonymous, đăng nhập bình thường
       const userCredential = await signInWithPopup(auth, provider);
       return userCredential.user;
     }

@@ -1,3 +1,4 @@
+
 :root {
   --sat: env(safe-area-inset-top);
   --sab: env(safe-area-inset-bottom);
@@ -98,4 +99,17 @@ img {
 
 .active-scale:active {
   transform: scale(0.96);
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.header-gradient {
+  background: linear-gradient(135deg, var(--app-primary), var(--app-secondary));
 }

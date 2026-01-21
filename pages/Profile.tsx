@@ -3,20 +3,18 @@ import React, { useState, Suspense, lazy } from 'react';
 import { UserProfile } from '../services/userService';
 import { 
   User as UserIcon, 
-  Star, 
   Settings, 
   LogOut, 
   Trash2, 
   ArrowRight, 
-  ShieldCheck,
-  Loader2
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 import { logout, loginWithEmail, upgradeAccount } from '../services/authService';
 import { auth } from '../services/firebase';
 import { playAudio } from '../utils/audioUtils';
+import StudyRoom from '../components/profile/StudyRoom';
 
-// Lazy loading sub-modules
-const AIQuotaCard = lazy(() => import('../components/profile/AIQuotaCard'));
 const AuthModule = lazy(() => import('../components/profile/AuthModule'));
 
 interface ProfileProps {
@@ -27,11 +25,8 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ userProfile, voiceGender, onGenderToggle, quotaInfo }) => {
-  // Fix: Removed authLoading and authError states as they are handled internally by AuthModule's useAuthForm hook
   const isGuest = !auth.currentUser || auth.currentUser.isAnonymous;
 
-  // Fix: Simplified handleAuthSubmit to remove redundant local state updates. 
-  // Any errors thrown here will be caught and displayed by the AuthModule's internal error handler.
   const handleAuthSubmit = async (data: any) => {
     if (data.mode === 'register') {
       await upgradeAccount(data.email, data.password, data.name);
@@ -50,34 +45,30 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, voiceGender, onGenderTog
 
   return (
     <div className="p-6 h-full flex flex-col animate-fade-in pb-32 overflow-y-auto no-scrollbar">
-      {/* Profile Header */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="relative mb-6">
-          <div className={`w-28 h-28 rounded-[40px] flex items-center justify-center text-4xl font-black shadow-xl border-4 border-white ${isGuest ? 'bg-slate-200 text-slate-400' : 'bg-app-primary text-white'}`}>
-            {userProfile.displayName?.[0] || 'K'}
+      {/* 2D Study Room Section */}
+      <div className="mb-8">
+        <StudyRoom user={userProfile} />
+      </div>
+
+      <div className="bg-white rounded-[32px] p-6 soft-shadow border border-slate-100 mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-app-primary/10 rounded-2xl flex items-center justify-center text-app-primary">
+            <Sparkles size={24} />
           </div>
-          {!isGuest && (
-            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 rounded-full border-4 border-white flex items-center justify-center text-white shadow-lg">
-              <ShieldCheck size={20} />
-            </div>
-          )}
+          <div>
+            <h4 className="text-sm font-black text-app-text">Kỹ năng Chuyên ngành</h4>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{userProfile.primaryIndustry}</p>
+          </div>
         </div>
-        <h3 className="text-2xl font-black text-app-text mb-1">{userProfile.displayName || "Học viên Star"}</h3>
-        <div className="flex items-center gap-1 mb-2">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={14} fill={i < userProfile.starLevel ? "currentColor" : "none"} className={i < userProfile.starLevel ? "text-amber-400" : "text-slate-200"} />
-          ))}
+        <div className="text-right">
+          <span className="text-xl font-black text-app-primary">Lvl {userProfile.starLevel}</span>
         </div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{isGuest ? "Guest Account" : userProfile.email}</p>
       </div>
 
       <Suspense fallback={<div className="h-20 flex items-center justify-center"><Loader2 className="animate-spin text-slate-200" /></div>}>
-        <AIQuotaCard used={quotaInfo.used} limit={quotaInfo.limit} isAdmin={userProfile.isAdmin} />
-        
         {isGuest && (
           <div className="mb-8">
             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-2">Lưu lại tiến trình học</h4>
-            {/* Fix: AuthModule manages its own loading/error state internally; removed invalid props */}
             <AuthModule onSubmit={handleAuthSubmit} />
           </div>
         )}
