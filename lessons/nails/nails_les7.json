@@ -1,0 +1,47 @@
+
+{
+  "id": "nails_les7",
+  "order": 7,
+  "title": "Checkout & Reviews",
+  "description": "Thanh toán và xin đánh giá dịch vụ.",
+  "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=400&auto=format&fit=crop",
+  "context": {
+    "background": "Khách hàng đã xong và chuẩn bị ra về.",
+    "goal": "Hoàn tất thanh toán và gợi ý để lại review.",
+    "characters": [
+      { "name": "Tiên", "role": "Thu ngân." },
+      { "name": "Ms. Minh", "role": "Khách hàng." }
+    ]
+  },
+  "steps": [
+    {
+      "id": "nails_l7_s1",
+      "title": "Bước 1: Thanh toán",
+      "purpose": "Kết thúc giao dịch",
+      "lines": [
+        {
+          "id": "nails_l7_s1_l1",
+          "speaker": "Tech",
+          "text": "Your total is $50. How would you like to pay?",
+          "translation": "Tổng của chị là 50 đô ạ. Chị muốn thanh toán thế nào?"
+        }
+      ]
+    }
+  ],
+  "vocabularies": [
+    { "id": "v1", "word": "Receipt", "translation": "Hóa đơn", "ipa": "/rɪˈsiːt/" },
+    { "id": "v2", "word": "Review", "translation": "Đánh giá", "ipa": "/rɪˈvjuː/" }
+  ],
+  "grammar_points": [
+    {
+      "id": "g1",
+      "title": "Payment Method",
+      "description": "Hỏi phương thức thanh toán.",
+      "examples": [{ "english": "Cash or card?", "vietnamese": "Tiền mặt hay thẻ?" }]
+    }
+  ],
+  "roleplay": {
+    "ai_instructions": "You are Ms. Minh. You are happy with the nails. You want to pay by card and ask where to leave a review.",
+    "user_instructions": "Bạn là thu ngân Tiên. Hãy hỗ trợ khách thanh toán và xin review trên Google Maps."
+  }
+}

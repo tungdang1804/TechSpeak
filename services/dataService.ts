@@ -11,20 +11,20 @@ const LESSONS_MANIFEST = {
       "id": "nails",
       "name": "Nail & Spa",
       "lessons": [
-        "lessons/nails/nails-l1-proactive-booking.json",
-        "lessons/nails/nails-l2-welcome-consultation.json",
-        "lessons/nails/nails-l3-cuticle-care.json",
-        "lessons/nails/nails-l4-extension-shaping.json",
-        "lessons/nails/nails-l5-art-finishing.json",
-        "lessons/nails/nails-l6-handling-complaints.json",
-        "lessons/nails/nails-l7-checkout-reviews.json",
-        "lessons/nails/nails-l8-repair-warranty.json"
+        "lessons/nails/nails_les1.json",
+        "lessons/nails/nails_les2.json",
+        "lessons/nails/nails_les3.json",
+        "lessons/nails/nails_les4.json",
+        "lessons/nails/nails_les5.json",
+        "lessons/nails/nails_les6.json",
+        "lessons/nails/nails_les7.json",
+        "lessons/nails/nails_les8.json"
       ]
     },
     {
       "id": "bartender",
       "name": "Bartender",
-      "lessons": ["lessons/bartender/bartender-l1-intro-mixology.json"]
+      "lessons": ["lessons/bartender/bartender_les1.json"]
     }
   ]
 };
