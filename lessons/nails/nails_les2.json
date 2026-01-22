@@ -1,54 +1,108 @@
-
 {
   "id": "nails_les2",
+  "industryId": "nails",
   "order": 2,
   "title": "Welcome & Consultation",
-  "description": "Đón khách và tư vấn mẫu thiết kế (Cat-eye, 3D).",
-  "thumbnail": "https://images.unsplash.com/photo-1604902396830-aca29e19b067?q=80&w=400&auto=format&fit=crop",
-  "context": {
-    "background": "Khách hàng Ms. Minh trực tiếp ghé tiệm theo lịch hẹn.",
-    "goal": "Chào đón khách và thực hiện tư vấn thiết kế phù hợp sự kiện.",
-    "characters": [
-      { "name": "Tiên", "role": "Nhân viên tư vấn." },
-      { "name": "Ms. Minh", "role": "Khách hàng dự sự kiện." }
-    ]
-  },
+  "description": "Đón khách, mời nước và tư vấn mẫu thiết kế dựa trên trang phục/sự kiện.",
+  "situation": "Khách hàng Ms. Minh đến tiệm theo lịch hẹn. Tiên tiếp đón và tư vấn mẫu móng phù hợp với đám cưới chị sắp tham dự.",
+  "objective": "Tạo ấn tượng ban đầu chuyên nghiệp và xác định phong cách thiết kế (Cat-eye, 3D, Extensions).",
   "steps": [
     {
-      "id": "l2_step1",
-      "title": "Bước 1: Chào đón & Kiểm tra lịch",
-      "purpose": "Xác nhận lịch hẹn chuyên nghiệp",
-      "lines": [
-        {
-          "id": "l2_s1_cust",
-          "speaker": "Customer",
-          "text": "Hi, my name is Minh. I booked an appointment for 2:30.",
-          "translation": "Chào bạn, tôi là Minh. Tôi đã có lịch lúc 2:30."
+      "step": 1,
+      "purpose": "Chào đón và xác nhận lịch hẹn",
+      "dialogue": {
+        "output": {
+          "primary": "Welcome to Star Spa, Ms. Minh! Your station is ready. Please come this way.",
+          "primary_vi": "Chào mừng chị Minh đến với Star Spa! Vị trí của chị đã sẵn sàng rồi ạ. Mời chị đi lối này.",
+          "alternatives": [
+            {
+              "text": "Good to see you again! Please follow me to your seat.",
+              "vi": "Rất vui được gặp lại chị! Mời chị đi theo em đến chỗ ngồi ạ."
+            },
+            {
+              "text": "Hello Ms. Minh, we've been expecting you. Your technician is waiting.",
+              "vi": "Chào chị Minh, chúng em đang đợi chị ạ. Kỹ thuật viên của chị đang chờ rồi."
+            }
+          ]
         },
-        {
-          "id": "l2_s1_tech",
-          "speaker": "Tech",
-          "text": "Welcome to Star Spa, Ms. Minh. Your station is ready.",
-          "translation": "Chào mừng chị Minh. Chỗ ngồi của chị đã sẵn sàng."
-        }
-      ]
-    }
-  ],
-  "vocabularies": [
-    { "id": "v1", "word": "Station", "translation": "Vị trí làm việc", "ipa": "/ˈsteɪʃn/" },
-    { "id": "v2", "word": "Elegant", "translation": "Sang trọng", "ipa": "/ˈelɪɡənt/" },
-    { "id": "v3", "word": "Unique", "translation": "Độc đáo", "ipa": "/juˈniːk/" }
-  ],
-  "grammar_points": [
+        "input": "Thank you. It’s a bit hot outside today.",
+        "input_vi": "Cảm ơn em. Hôm nay ngoài trời hơi nóng nhỉ."
+      }
+    },
     {
-      "id": "g1",
-      "title": "Polite Request (Đề nghị lịch sự)",
-      "description": "Dùng 'Would you like to' để mời khách.",
-      "examples": [{ "english": "Would you like to take a look?", "vietnamese": "Chị có muốn xem qua không?" }]
+      "step": 2,
+      "purpose": "Mời nước và tạo sự thoải mái",
+      "dialogue": {
+        "output": {
+          "primary": "Would you like some water or tea while we prepare your tools?",
+          "primary_vi": "Chị có muốn dùng chút nước hay trà trong lúc chúng em chuẩn bị dụng cụ không ạ?",
+          "alternatives": [
+            {
+              "text": "Can I get you a drink before we start?",
+              "vi": "Em có thể lấy cho chị chút đồ uống trước khi mình bắt đầu không?"
+            },
+            {
+              "text": "Please relax. Would you like a cold towel to cool down?",
+              "vi": "Chị cứ thư giãn ạ. Chị có muốn dùng khăn lạnh để giải nhiệt không?"
+            }
+          ]
+        },
+        "input": "Just some water, please.",
+        "input_vi": "Cho chị xin chút nước thôi."
+      }
+    },
+    {
+      "step": 3,
+      "purpose": "Tư vấn thiết kế theo trang phục/sự kiện",
+      "dialogue": {
+        "output": {
+          "primary": "I see you're wearing a lovely dress. Is it for a special event?",
+          "primary_vi": "Em thấy chị đang mặc một chiếc váy rất đẹp. Chị đi sự kiện đặc biệt nào ạ?",
+          "alternatives": [
+            {
+              "text": "Are you looking for something unique for the wedding this weekend?",
+              "vi": "Chị có đang tìm kiếm mẫu nào độc đáo cho đám cưới cuối tuần này không ạ?"
+            },
+            {
+              "text": "Would you like a design that matches the color of your outfit?",
+              "vi": "Chị có muốn một mẫu thiết kế hợp với màu trang phục của mình không ạ?"
+            }
+          ]
+        },
+        "input": "Yes, I'm going to a wedding. I want something elegant.",
+        "input_vi": "Đúng rồi, chị sắp đi đám cưới. Chị muốn kiểu gì đó sang trọng."
+      }
+    },
+    {
+      "step": 4,
+      "purpose": "Xác định phong cách cụ thể",
+      "dialogue": {
+        "output": {
+          "primary": "What would you like to get done? Maybe some cat-eye or 3D art?",
+          "primary_vi": "Chị muốn làm gì ạ? Có lẽ là hiệu ứng mắt mèo hay vẽ 3D chăng?",
+          "alternatives": [
+            {
+              "text": "Do you have a design in mind, or should I suggest some trendy styles?",
+              "vi": "Chị đã có mẫu nào trong đầu chưa, hay để em gợi ý một vài kiểu đang thịnh hành nhé?"
+            },
+            {
+              "text": "We have new extension styles. Would you like to try them for a total transformation?",
+              "vi": "Bên em có các kiểu nối móng mới. Chị có muốn thử để thay đổi diện mạo hoàn toàn không?"
+            }
+          ]
+        }
+      }
     }
   ],
-  "roleplay": {
-    "user_instructions": "Bạn là Tiên. Hãy đón chị Minh và tư vấn mẫu móng sang trọng.",
-    "ai_instructions": "You are Ms. Minh. You want something elegant for a wedding. You like 3D powder art."
+  "vocabulary": [
+    {"word": "Station", "vi": "Vị trí làm việc/Ghế", "category": "general"},
+    {"word": "Unique", "vi": "Độc đáo", "category": "general"},
+    {"word": "Transformation", "vi": "Thay đổi diện mạo", "category": "general"},
+    {"word": "Wedding", "vi": "Đám cưới", "category": "general"},
+    {"word": "Manicure", "vi": "Dịch vụ làm móng tay", "category": "specialized"}
+  ],
+  "grammar": {
+    "structures": ["Polite invitations", "Future Continuous for offers"],
+    "collocations": ["Have a design in mind", "Suits you very well"]
   }
 }

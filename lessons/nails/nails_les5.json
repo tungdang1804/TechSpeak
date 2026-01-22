@@ -1,47 +1,108 @@
-
 {
   "id": "nails_les5",
+  "industryId": "nails",
   "order": 5,
-  "title": "Nail Art & Finishing",
-  "description": "Nghệ thuật sơn gel, vẽ trang trí và phủ bóng.",
-  "thumbnail": "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
-  "context": {
-    "background": "Hân thực hiện công đoạn trang trí cuối cùng.",
-    "goal": "Xác nhận màu sơn và hướng dẫn hơ đèn.",
-    "characters": [
-      { "name": "Hân", "role": "Kỹ thuật viên." },
-      { "name": "Ms. Minh", "role": "Khách hàng." }
-    ]
-  },
+  "title": "Art & Finishing",
+  "description": "Sơn màu, hiệu ứng mắt mèo và hoàn thiện sản phẩm.",
+  "situation": "Giai đoạn sơn màu và hơ đèn. Khách hàng chọn hiệu ứng mắt mèo hạt mịn cho bộ móng của mình.",
+  "objective": "Hướng dẫn khách thao tác với đèn hơ móng, thực hiện kỹ thuật mắt mèo và kiểm tra độ bóng cuối cùng.",
   "steps": [
     {
-      "id": "nails_l5_s1",
-      "title": "Bước 1: Hơ đèn",
-      "purpose": "Đảm bảo gel khô hoàn toàn",
-      "lines": [
-        {
-          "id": "nails_l5_s1_l1",
-          "speaker": "Tech",
-          "text": "Please put your hand in the lamp for 60 seconds.",
-          "translation": "Vui lòng đặt tay chị vào đèn trong 60 giây."
-        }
-      ]
-    }
-  ],
-  "vocabularies": [
-    { "id": "v1", "word": "Shade", "translation": "Tông màu", "ipa": "/ʃeɪd/" },
-    { "id": "v2", "word": "Top coat", "translation": "Sơn bóng", "ipa": "/tɒp kəʊt/" }
-  ],
-  "grammar_points": [
+      "step": 1,
+      "purpose": "Sơn lớp nền và Thử màu",
+      "dialogue": {
+        "output": {
+          "primary": "Let's try the color on one nail first. Is this shade okay for you?",
+          "primary_vi": "Để em thử màu trên một móng trước nhé. Tông màu này ổn với chị chứ ạ?",
+          "alternatives": [
+            {
+              "text": "I’ll apply a base gel first to protect your nails.",
+              "vi": "Em sẽ sơn một lớp liên kết trước để bảo vệ móng của chị ạ."
+            },
+            {
+              "text": "Do you want one coat for a light look or two coats for a darker shade?",
+              "vi": "Chị muốn sơn một lớp để nhìn nhạt hay hai lớp để màu đậm hơn ạ?"
+            }
+          ]
+        },
+        "input": "Two coats, please. I like it a bit darker.",
+        "input_vi": "Sơn hai lớp nhé. Chị thích màu đậm hơn một chút."
+      }
+    },
     {
-      "id": "g1",
-      "title": "Duration",
-      "description": "Dùng 'for + time' để chỉ khoảng thời gian.",
-      "examples": [{ "english": "Wait for 1 minute.", "vietnamese": "Đợi trong 1 phút." }]
+      "step": 2,
+      "purpose": "Hướng dẫn sử dụng đèn hơ (LED/UV Lamp)",
+      "dialogue": {
+        "output": {
+          "primary": "Please put your hand in the lamp for 60 seconds. Keep it flat.",
+          "primary_vi": "Chị vui lòng cho tay vào đèn trong 60 giây nhé. Hãy để tay phẳng ạ.",
+          "alternatives": [
+            {
+              "text": "If it feels too hot, you can take your hand out for a moment.",
+              "vi": "Nếu cảm thấy nóng quá, chị có thể đưa tay ra ngoài một lúc ạ."
+            },
+            {
+              "text": "Please put only your thumb in the lamp this time.",
+              "vi": "Lần này chị vui lòng chỉ cho ngón cái vào đèn thôi nhé."
+            }
+          ]
+        },
+        "input": "Okay, I'll keep my hand still.",
+        "input_vi": "Được rồi, chị sẽ giữ yên tay."
+      }
+    },
+    {
+      "step": 3,
+      "purpose": "Thực hiện hiệu ứng mắt mèo (Cat-eye)",
+      "dialogue": {
+        "output": {
+          "primary": "I'm using the magnet for the cat-eye effect. Do you like this fine grain look?",
+          "primary_vi": "Em đang dùng nam châm để tạo hiệu ứng mắt mèo. Chị có thích kiểu hạt mịn này không ạ?",
+          "alternatives": [
+            {
+              "text": "I can make the cat-eye line sharper if you prefer.",
+              "vi": "Em có thể làm cho đường mắt mèo sắc nét hơn nếu chị muốn ạ."
+            },
+            {
+              "text": "This cat-eye effect looks amazing under the light, doesn't it?",
+              "vi": "Hiệu ứng mắt mèo này nhìn rất tuyệt dưới ánh sáng, phải không chị?"
+            }
+          ]
+        },
+        "input": "Wow, it looks very sparkly! I love it.",
+        "input_vi": "Ồ, nhìn lấp lánh quá! Chị thích lắm."
+      }
+    },
+    {
+      "step": 4,
+      "purpose": "Sơn bóng và Hoàn tất (Finishing)",
+      "dialogue": {
+        "output": {
+          "primary": "Your nails look amazing! Let me apply some top coat for a long-lasting shine.",
+          "primary_vi": "Móng của chị nhìn tuyệt quá! Để em sơn lớp bóng để giữ độ sáng lâu nhé.",
+          "alternatives": [
+            {
+              "text": "I’ll wipe off the dust and apply some cuticle oil to finish.",
+              "vi": "Em sẽ lau sạch bụi và bôi chút dầu dưỡng để hoàn tất nhé."
+            },
+            {
+              "text": "All done! Please check if you are happy with the results.",
+              "vi": "Xong hết rồi ạ! Chị vui lòng kiểm tra xem có hài lòng với kết quả không ạ?"
+            }
+          ]
+        }
+      }
     }
   ],
-  "roleplay": {
-    "ai_instructions": "You are Ms. Minh. You want two coats of red gel and worry if it's too hot in the lamp.",
-    "user_instructions": "Bạn là thợ Hân. Hãy hướng dẫn khách hơ đèn và kiểm tra độ bóng cuối cùng."
+  "vocabulary": [
+    {"word": "Cat-eye", "vi": "Mắt mèo", "category": "specialized"},
+    {"word": "Lamp", "vi": "Đèn hơ móng", "category": "specialized"},
+    {"word": "Shade", "vi": "Tông màu/Sắc thái", "category": "general"},
+    {"word": "Wipe off", "vi": "Lau sạch", "category": "general"},
+    {"word": "Shiny finish", "vi": "Lớp bóng hoàn thiện", "category": "specialized"}
+  ],
+  "grammar": {
+    "structures": ["Polite commands", "Conditionals (If...)", "Tag questions (..., doesn't it?)"],
+    "collocations": ["Two coats", "Take your hand out", "Long-lasting shine"]
   }
 }

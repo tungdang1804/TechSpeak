@@ -1,47 +1,110 @@
-
 {
   "id": "nails_les6",
+  "industryId": "nails",
   "order": 6,
   "title": "Handling Complaints",
-  "description": "Giải quyết khiếu nại và xin lỗi chuyên nghiệp.",
-  "thumbnail": "https://images.unsplash.com/photo-1590008828475-577319bbc832?q=80&w=400&auto=format&fit=crop",
-  "context": {
-    "background": "Ms. Minh không hài lòng vì màu sơn không giống mẫu.",
-    "goal": "Xử lý tình huống căng thẳng và đưa ra giải pháp.",
-    "characters": [
-      { "name": "Tiên", "role": "Quản lý." },
-      { "name": "Ms. Minh", "role": "Khách hàng." }
-    ]
-  },
+  "description": "Giải quyết khiếu nại: Xử lý tình huống khách không hài lòng ngay tại chỗ.",
+  "situation": "Dịch vụ hoàn tất nhưng khách hàng cảm thấy màu sơn đậm hơn mẫu và bị đau ở ngón tay.",
+  "objective": "Lắng nghe phàn nàn, xin lỗi chuyên nghiệp và đưa ra giải pháp khắc phục ngay lập tức.",
   "steps": [
     {
-      "id": "nails_l6_s1",
-      "title": "Bước 1: Xin lỗi chuyên nghiệp",
-      "purpose": "Xoa dịu khách hàng",
-      "lines": [
-        {
-          "id": "nails_l6_s1_l1",
-          "speaker": "Tech",
-          "text": "I'm sorry for the inconvenience. Let me fix this for you.",
-          "translation": "Em rất xin lỗi vì sự bất tiện này. Để em sửa lại cho chị ạ."
-        }
-      ]
-    }
-  ],
-  "vocabularies": [
-    { "id": "v1", "word": "Inconvenience", "translation": "Sự bất tiện", "ipa": "/ˌɪnkənˈviːniəns/" },
-    { "id": "v2", "word": "Fix", "translation": "Sửa chữa", "ipa": "/fɪks/" }
-  ],
-  "grammar_points": [
+      "step": 1,
+      "purpose": "Lắng nghe và Xác định vấn đề",
+      "dialogue": {
+        "output": {
+          "primary": "I'm sorry to hear that, Ms. Minh. What seems to be the problem?",
+          "primary_vi": "Em rất tiếc khi nghe điều đó, chị Minh. Dạ có vấn đề gì vậy ạ?",
+          "alternatives": [
+            {
+              "text": "I apologize for the discomfort. Could you please show me which part you don't like?",
+              "vi": "Em xin lỗi vì sự khó chịu này. Chị có thể chỉ cho em phần nào chị chưa ưng ý không ạ?"
+            },
+            {
+              "text": "I'm sorry, is the shape too sharp or is the color wrong?",
+              "vi": "Em xin lỗi, dáng móng bị nhọn quá hay màu sắc bị sai ạ?"
+            }
+          ]
+        },
+        "input": "The color is much darker than the sample and this finger is sore.",
+        "input_vi": "Màu này đậm hơn mẫu nhiều quá và ngón tay này bị đau."
+      }
+    },
     {
-      "id": "g1",
-      "title": "Apology",
-      "description": "Cấu trúc 'I'm sorry for...'.",
-      "examples": [{ "english": "I'm sorry for the delay.", "vietnamese": "Xin lỗi vì sự chậm trễ." }]
+      "step": 2,
+      "purpose": "Xử lý cảm giác đau (Sensation Issue)",
+      "dialogue": {
+        "output": {
+          "primary": "I'm so sorry, let me clean that for you right away. I'll be very gentle.",
+          "primary_vi": "Em vô cùng xin lỗi, để em làm sạch vết đó cho chị ngay lập tức. Em sẽ làm rất nhẹ nhàng ạ.",
+          "alternatives": [
+            {
+              "text": "I apologize. I will use a sterilized tool to fix it carefully.",
+              "vi": "Em xin lỗi ạ. Em sẽ dùng dụng cụ đã tiệt trùng để xử lý cẩn thận cho chị."
+            },
+            {
+              "text": "Does it feel better now? I will make sure it's safe and clean.",
+              "vi": "Giờ chị thấy đỡ hơn chưa ạ? Em sẽ đảm bảo nó an toàn và sạch sẽ."
+            }
+          ]
+        },
+        "input": "It's a bit better now, but please be careful.",
+        "input_vi": "Giờ thấy đỡ hơn một chút rồi, nhưng làm ơn hãy cẩn thận."
+      }
+    },
+    {
+      "step": 3,
+      "purpose": "Đề xuất giải pháp sửa chữa (Fixing)",
+      "dialogue": {
+        "output": {
+          "primary": "If you don't like the shade, I can wipe it off and re-apply a lighter color.",
+          "primary_vi": "Nếu chị không thích tông màu này, em có thể lau đi và sơn lại màu nhạt hơn cho chị ạ.",
+          "alternatives": [
+            {
+              "text": "Would you like me to reshape the nails or shorten the length for you?",
+              "vi": "Chị có muốn em dũa lại form móng hay cắt ngắn độ dài đi cho chị không ạ?"
+            },
+            {
+              "text": "I'll fix this for you right now. It won't take long.",
+              "vi": "Em sẽ sửa lại phần này cho chị ngay bây giờ. Sẽ không mất nhiều thời gian đâu ạ."
+            }
+          ]
+        },
+        "input": "Please change it to a lighter shade.",
+        "input_vi": "Làm ơn đổi sang tông màu nhạt hơn giúp chị."
+      }
+    },
+    {
+      "step": 4,
+      "purpose": "Xác nhận hài lòng và Bồi thường",
+      "dialogue": {
+        "output": {
+          "primary": "Are you happy with the new color? Since you had a bad experience, I’d like to offer you a 10% discount.",
+          "primary_vi": "Chị có hài lòng với màu mới này không ạ? Vì chị đã có trải nghiệm không tốt, em xin phép giảm giá 10% cho chị ạ.",
+          "alternatives": [
+            {
+              "text": "I've made it right for you. Is there anything else I can do to help?",
+              "vi": "Em đã khắc phục xong cho chị rồi ạ. Em còn có thể giúp gì thêm không ạ?"
+            },
+            {
+              "text": "I apologize again. We hope you will give us another chance.",
+              "vi": "Em xin lỗi chị một lần nữa. Bên em hy vọng chị sẽ cho chúng em thêm cơ hội ạ."
+            }
+          ]
+        },
+        "input": "Yes, this is much better. Thank you for fixing it.",
+        "input_vi": "Vâng, thế này tốt hơn nhiều rồi. Cảm ơn em đã sửa lại nhé."
+      }
     }
   ],
-  "roleplay": {
-    "ai_instructions": "You are Ms. Minh. You are angry because the color is too dark and you are in a hurry.",
-    "user_instructions": "Bạn là quản lý Tiên. Hãy xin lỗi, xoa dịu khách và đề nghị giải pháp nhanh nhất."
+  "vocabulary": [
+    {"word": "Apologize", "vi": "Xin lỗi", "category": "general"},
+    {"word": "Sore", "vi": "Đau nhức", "category": "general"},
+    {"word": "Sample", "vi": "Mẫu màu", "category": "specialized"},
+    {"word": "Bleeding", "vi": "Chảy máu", "category": "general"},
+    {"word": "Discount", "vi": "Giảm giá", "category": "general"}
+  ],
+  "grammar": {
+    "structures": ["Polite Apologies", "Conditionals (If... I can...)", "What seems to be the problem?"],
+    "collocations": ["I'm sorry to hear that", "Right away", "Make it right"]
   }
 }

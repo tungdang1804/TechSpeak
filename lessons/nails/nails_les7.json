@@ -1,47 +1,108 @@
-
 {
   "id": "nails_les7",
+  "industryId": "nails",
   "order": 7,
   "title": "Checkout & Reviews",
-  "description": "Thanh toán và xin đánh giá dịch vụ.",
-  "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=400&auto=format&fit=crop",
-  "context": {
-    "background": "Khách hàng đã xong và chuẩn bị ra về.",
-    "goal": "Hoàn tất thanh toán và gợi ý để lại review.",
-    "characters": [
-      { "name": "Tiên", "role": "Thu ngân." },
-      { "name": "Ms. Minh", "role": "Khách hàng." }
-    ]
-  },
+  "description": "Thanh toán, gợi ý Tip và xin đánh giá trên Google/Facebook/Instagram.",
+  "situation": "Khách hàng hoàn tất dịch vụ và tiến hành thanh toán tại quầy. Tiên thực hiện thu ngân và tối ưu hóa hiện diện trực tuyến cho tiệm.",
+  "objective": "Thực hiện giao dịch tài chính chuyên nghiệp và khéo léo nhờ khách hàng để lại phản hồi tốt trên mạng xã hội.",
   "steps": [
     {
-      "id": "nails_l7_s1",
-      "title": "Bước 1: Thanh toán",
-      "purpose": "Kết thúc giao dịch",
-      "lines": [
-        {
-          "id": "nails_l7_s1_l1",
-          "speaker": "Tech",
-          "text": "Your total is $50. How would you like to pay?",
-          "translation": "Tổng của chị là 50 đô ạ. Chị muốn thanh toán thế nào?"
-        }
-      ]
-    }
-  ],
-  "vocabularies": [
-    { "id": "v1", "word": "Receipt", "translation": "Hóa đơn", "ipa": "/rɪˈsiːt/" },
-    { "id": "v2", "word": "Review", "translation": "Đánh giá", "ipa": "/rɪˈvjuː/" }
-  ],
-  "grammar_points": [
+      "step": 1,
+      "purpose": "Tổng kết hóa đơn & Phương thức thanh toán",
+      "dialogue": {
+        "output": {
+          "primary": "Your total today is $50. How would you like to pay?",
+          "primary_vi": "Tổng chi phí hôm nay là 50 đô ạ. Chị muốn thanh toán thế nào ạ?",
+          "alternatives": [
+            {
+              "text": "Do you want to pay by cash, credit card, or Apple Pay?",
+              "vi": "Chị muốn trả bằng tiền mặt, thẻ tín dụng hay Apple Pay ạ?"
+            },
+            {
+              "text": "The total service fee is $50. Will you be paying by card?",
+              "vi": "Tổng phí dịch vụ là 50 đô. Chị sẽ thanh toán bằng thẻ phải không ạ?"
+            }
+          ]
+        },
+        "input": "I'll pay by credit card. Can I add a tip on the machine?",
+        "input_vi": "Chị trả bằng thẻ. Chị có thể thêm tiền tip trên máy luôn không?"
+      }
+    },
     {
-      "id": "g1",
-      "title": "Payment Method",
-      "description": "Hỏi phương thức thanh toán.",
-      "examples": [{ "english": "Cash or card?", "vietnamese": "Tiền mặt hay thẻ?" }]
+      "step": 2,
+      "purpose": "Gợi ý Tiền Tip & Hoàn tất giao dịch",
+      "dialogue": {
+        "output": {
+          "primary": "Yes, you can select the tip amount on the screen. Thank you so much!",
+          "primary_vi": "Dạ được, chị có thể chọn số tiền tip trên màn hình ạ. Em cảm ơn chị rất nhiều!",
+          "alternatives": [
+            {
+              "text": "Please select your preferred tip percentage and sign here.",
+              "vi": "Vui lòng chọn tỷ lệ phần trăm tip chị muốn và ký tên vào đây ạ."
+            },
+            {
+              "text": "Here is your receipt. I've included the tip as you requested.",
+              "vi": "Đây là hóa đơn của chị ạ. Em đã gộp cả tiền tip như chị yêu cầu rồi ạ."
+            }
+          ]
+        },
+        "input": "All done. Here is your receipt back.",
+        "input_vi": "Xong rồi đây. Gửi lại em hóa đơn này."
+      }
+    },
+    {
+      "step": 3,
+      "purpose": "Xin đánh giá trên mạng xã hội",
+      "dialogue": {
+        "output": {
+          "primary": "If you are happy with our service, could you please leave a review on Google Maps?",
+          "primary_vi": "Nếu chị hài lòng với dịch vụ, chị có thể để lại đánh giá trên Google Maps giúp bên em không ạ?",
+          "alternatives": [
+            {
+              "text": "We would love to see your nails on Instagram. Please tag Star Spa in your story!",
+              "vi": "Bên em rất muốn thấy bộ móng của chị trên Instagram. Chị nhớ gắn thẻ Star Spa vào story nhé!"
+            },
+            {
+              "text": "You will get a 5% discount for your next visit if you follow us on Facebook.",
+              "vi": "Chị sẽ được giảm giá 5% cho lần tới nếu chị theo dõi bên em trên Facebook ạ."
+            }
+          ]
+        },
+        "input": "Sure! I'll post a photo and tag you guys.",
+        "input_vi": "Chắc chắn rồi! Chị sẽ đăng ảnh và gắn thẻ các em."
+      }
+    },
+    {
+      "step": 4,
+      "purpose": "Hẹn lịch lần tới & Chào tạm biệt",
+      "dialogue": {
+        "output": {
+          "primary": "Would you like to re-book for next month now? We are filling up fast.",
+          "primary_vi": "Chị có muốn đặt lịch luôn cho tháng tới không ạ? Lịch bên em đang kín dần rồi ạ.",
+          "alternatives": [
+            {
+              "text": "Thank you for choosing Star Spa. Have a wonderful day!",
+              "vi": "Cảm ơn chị đã chọn Star Spa. Chúc chị một ngày tuyệt vời ạ!"
+            },
+            {
+              "text": "We look forward to seeing you again soon. Take care!",
+              "vi": "Chúng em rất mong sớm được gặp lại chị. Chị đi cẩn thận nhé!"
+            }
+          ]
+        }
+      }
     }
   ],
-  "roleplay": {
-    "ai_instructions": "You are Ms. Minh. You are happy with the nails. You want to pay by card and ask where to leave a review.",
-    "user_instructions": "Bạn là thu ngân Tiên. Hãy hỗ trợ khách thanh toán và xin review trên Google Maps."
+  "vocabulary": [
+    {"word": "Total", "vi": "Tổng số/Tổng tiền", "category": "general"},
+    {"word": "Receipt", "vi": "Hóa đơn", "category": "general"},
+    {"word": "Tip amount", "vi": "Số tiền thưởng", "category": "general"},
+    {"word": "Review", "vi": "Đánh giá/Phản hồi", "category": "general"},
+    {"word": "Tag", "vi": "Gắn thẻ", "category": "general"}
+  ],
+  "grammar": {
+    "structures": ["How would you like to pay?", "Conditionals (If you are happy..., could you please...?)"],
+    "collocations": ["Leave a review", "Sign here", "Have a wonderful day"]
   }
 }

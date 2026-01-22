@@ -1,47 +1,108 @@
-
 {
   "id": "nails_les8",
+  "industryId": "nails",
   "order": 8,
-  "title": "Nail Repair & Warranty",
-  "description": "Xử lý bảo hành móng bị mẻ hoặc bong tróc.",
-  "thumbnail": "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=400&auto=format&fit=crop",
-  "context": {
-    "background": "Ms. Minh quay lại sau 3 ngày vì một móng bị mẻ.",
-    "goal": "Xác định thời gian và áp dụng chính sách bảo hành.",
-    "characters": [
-      { "name": "Tiên", "role": "Lễ tân." },
-      { "name": "Ms. Minh", "role": "Khách hàng." }
-    ]
-  },
+  "title": "Warranty & Repair",
+  "description": "Xác minh và sửa chữa móng: Bảo hành trong vòng 7 ngày.",
+  "situation": "Khách hàng quay lại với một chiếc móng bị bong lớp sơn gel sau 5 ngày. Tiên thực hiện quy trình kiểm tra lịch sử để xác định quyền lợi bảo hành.",
+  "objective": "Xác minh nguồn gốc dịch vụ, thời gian sử dụng và báo chi phí sửa chữa (miễn phí bảo hành).",
   "steps": [
     {
-      "id": "nails_l8_s1",
-      "title": "Bước 1: Kiểm tra lịch sử",
-      "purpose": "Xác nhận thời hạn bảo hành",
-      "lines": [
-        {
-          "id": "nails_l8_s1_l1",
-          "speaker": "Tech",
-          "text": "When did you have them done? We have a 7-day warranty.",
-          "translation": "Chị làm bộ này từ khi nào ạ? Bên em có chính sách bảo hành 7 ngày."
-        }
-      ]
-    }
-  ],
-  "vocabularies": [
-    { "id": "v1", "word": "Warranty", "translation": "Bảo hành", "ipa": "/ˈwɔːrənti/" },
-    { "id": "v2", "word": "Chipped", "translation": "Bị mẻ", "ipa": "/tʃɪpt/" }
-  ],
-  "grammar_points": [
+      "step": 1,
+      "purpose": "Xác minh nguồn gốc dịch vụ",
+      "dialogue": {
+        "output": {
+          "primary": "Oh, I see the problem. Did you get these nails done at Star Spa or another salon?",
+          "primary_vi": "Ồ, em đã thấy vấn đề rồi. Bộ móng này chị làm tại Star Spa hay ở tiệm khác ạ?",
+          "alternatives": [
+            {
+              "text": "To help you better, could you tell me which technician did your nails?",
+              "vi": "Để hỗ trợ chị tốt hơn, chị có thể cho em biết nhân viên nào đã làm móng cho mình không ạ?"
+            },
+            {
+              "text": "Let me check our system to see your service history.",
+              "vi": "Để em kiểm tra hệ thống xem lịch sử dịch vụ của chị nhé."
+            }
+          ]
+        },
+        "input": "I did it here last week. I think the girl's name was Hân.",
+        "input_vi": "Chị làm ở đây tuần trước. Chị nhớ tên bạn đó là Hân."
+      }
+    },
     {
-      "id": "g1",
-      "title": "Past Time",
-      "description": "Hỏi thời điểm trong quá khứ.",
-      "examples": [{ "english": "When did you come?", "vietnamese": "Chị đến khi nào?" }]
+      "step": 2,
+      "purpose": "Kiểm tra thời gian & Bảo hành",
+      "dialogue": {
+        "output": {
+          "primary": "How many days ago did you have them done? We offer free repair within 7 days.",
+          "primary_vi": "Chị đã làm bộ móng này cách đây bao nhiêu ngày rồi ạ? Bên em bảo hành sửa miễn phí trong vòng 7 ngày ạ.",
+          "alternatives": [
+            {
+              "text": "Was it within the last week? Technical issues are covered by our warranty.",
+              "vi": "Có phải trong vòng tuần qua không ạ? Các lỗi kỹ thuật đều được bảo hành bên em ạ."
+            },
+            {
+              "text": "Let me confirm the date. If it's within 7 days, there's no charge.",
+              "vi": "Để em xác nhận lại ngày. Nếu trong vòng 7 ngày thì sẽ không tính phí ạ."
+            }
+          ]
+        },
+        "input": "It was exactly 5 days ago. The gel is peeling off.",
+        "input_vi": "Chính xác là cách đây 5 ngày. Lớp gel bị bong ra."
+      }
+    },
+    {
+      "step": 3,
+      "purpose": "Xác định nguyên nhân & Nhu cầu",
+      "dialogue": {
+        "output": {
+          "primary": "Is the nail chipped by itself, or would you like to change the whole set?",
+          "primary_vi": "Móng bị tróc tự nhiên hay chị muốn đổi cả bộ mới luôn ạ?",
+          "alternatives": [
+            {
+              "text": "Did you have an accident, or is the gel peeling off on this finger?",
+              "vi": "Chị vô tình gặp sự cố hay lớp gel tự bong ra ở ngón này ạ?"
+            },
+            {
+              "text": "Are you fixing just this one, or do you want to switch to a new style?",
+              "vi": "Chị chỉ sửa chiếc này thôi, hay chị muốn đổi sang kiểu mới luôn ạ?"
+            }
+          ]
+        },
+        "input": "I just want to fix this one, please. I didn't hit anything.",
+        "input_vi": "Chị chỉ muốn sửa chiếc này thôi. Chị không va quẹt vào đâu cả."
+      }
+    },
+    {
+      "step": 4,
+      "purpose": "Báo dịch vụ & Chi phí",
+      "dialogue": {
+        "output": {
+          "primary": "Since it's within 7 days, we will re-apply the gel for free of charge.",
+          "primary_vi": "Vì vẫn trong vòng 7 ngày, bên em sẽ sơn lại gel hoàn toàn miễn phí cho chị ạ.",
+          "alternatives": [
+            {
+              "text": "I will buff the surface and fix the nail for you right now.",
+              "vi": "Em sẽ dũa nhám bề mặt và sửa lại móng cho chị ngay bây giờ nhé."
+            },
+            {
+              "text": "If you want a new color, there will be a small repair fee.",
+              "vi": "Nếu chị muốn đổi màu mới, sẽ có một khoản phí sửa chữa nhỏ ạ."
+            }
+          ]
+        }
+      }
     }
   ],
-  "roleplay": {
-    "ai_instructions": "You are Ms. Minh. One of your nails is chipped. You are a regular customer and expect a free fix.",
-    "user_instructions": "Bạn là lễ tân Tiên. Hãy kiểm tra ngày làm móng và sắp xếp thợ sửa miễn phí nếu còn trong 7 ngày."
+  "vocabulary": [
+    {"word": "Warranty", "vi": "Bảo hành", "category": "general"},
+    {"word": "Chipped", "vi": "Bị mẻ/Tróc nhẹ", "category": "specialized"},
+    {"word": "Peeling off", "vi": "Bị bong tróc", "category": "specialized"},
+    {"word": "Free of charge", "vi": "Miễn phí", "category": "general"},
+    {"word": "Technician", "vi": "Kỹ thuật viên", "category": "general"}
+  ],
+  "grammar": {
+    "structures": ["How many days ago...?", "To help you better, ..."],
+    "collocations": ["Within 7 days", "Get something done", "Re-apply the gel"]
   }
 }

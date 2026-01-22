@@ -1,48 +1,88 @@
-
 {
   "id": "nails_les3",
+  "industryId": "nails",
   "order": 3,
   "title": "Cuticle Care & Treatment",
-  "description": "Vệ sinh da, xử lý móng khóe và hướng dẫn thực tế.",
-  "thumbnail": "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
-  "context": {
-    "background": "Kỹ thuật viên Hân thực hiện vệ sinh móng cho khách và hướng dẫn học viên.",
-    "goal": "Làm sạch da chuyên nghiệp và xử lý móng khóe an toàn.",
-    "characters": [
-      { "name": "Hân", "role": "Kỹ thuật viên chính." },
-      { "name": "Mi", "role": "Học viên." },
-      { "name": "Ms. Minh", "role": "Khách hàng bị đau móng khóe." }
-    ]
-  },
+  "description": "Vệ sinh da, xử lý móng khóe và hướng dẫn thực tế cho học viên.",
+  "situation": "Hân đang thực hiện vệ sinh da cho khách, đồng thời hướng dẫn học viên Mi về cách sử dụng dụng cụ an toàn.",
+  "objective": "Sử dụng đúng thuật ngữ dụng cụ, xử lý móng khóe an toàn và hỏi thăm cảm giác của khách trong suốt quy trình.",
   "steps": [
     {
-      "id": "nails_l3_s1",
-      "title": "Bước 1: Chuẩn bị dụng cụ",
-      "purpose": "Đảm bảo tiêu chuẩn vệ sinh",
-      "lines": [
-        {
-          "id": "nails_l3_s1_l1",
-          "speaker": "Tech",
-          "text": "Mi, please get the tool kit. We need cuticle nippers and the nail drill.",
-          "translation": "Mi ơi, lấy dùm chị bộ dụng cụ. Mình cần kiềm cắt da và máy mài móng."
-        }
-      ]
-    }
-  ],
-  "vocabularies": [
-    { "id": "v1", "word": "Safety", "translation": "An toàn", "ipa": "/ˈseɪfti/" },
-    { "id": "v2", "word": "Sterilizer", "translation": "Máy tiệt trùng", "ipa": "/ˈsterəlaɪzər/" }
-  ],
-  "grammar_points": [
+      "step": 1,
+      "purpose": "Chuẩn bị dụng cụ & Ngâm chân",
+      "dialogue": {
+        "output": {
+          "primary": "Mi, please get the tool kit and the sterilized nippers.",
+          "primary_vi": "Mi, lấy giúp chị bộ dụng cụ và kiềm đã tiệt trùng nhé.",
+          "alternatives": [
+            {
+              "text": "Please bring me the cuticle pusher and the nail drill.",
+              "vi": "Lấy giúp chị cây đẩy da và máy mài móng nhé."
+            },
+            {
+              "text": "First, let's soak your feet in the basin to soften the skin.",
+              "vi": "Đầu tiên, hãy ngâm chân trong bồn để làm mềm da nhé."
+            }
+          ]
+        },
+        "input": "Everything is ready. I'll put some softener in the water.",
+        "input_vi": "Mọi thứ sẵn sàng rồi ạ. Em sẽ cho thêm chút thuốc làm mềm vào nước."
+      }
+    },
     {
-      "id": "g1",
-      "title": "Imperatives",
-      "description": "Dùng 'Please + Verb' để yêu cầu.",
-      "examples": [{ "english": "Please get the kit.", "vietnamese": "Làm ơn lấy bộ dụng cụ." }]
+      "step": 2,
+      "purpose": "Xử lý khóe & Kiểm tra cảm giác",
+      "dialogue": {
+        "output": {
+          "primary": "Does it feel sore? I’m cleaning the ingrown nail now.",
+          "primary_vi": "Chị có thấy đau không? Em đang xử lý phần móng khóe ạ.",
+          "alternatives": [
+            {
+              "text": "Is it too hot? I'm using the drill for the dead skin.",
+              "vi": "Có bị nóng quá không ạ? Em đang dùng máy mài để xử lý da chết."
+            },
+            {
+              "text": "Please let me know if you feel any discomfort.",
+              "vi": "Vui lòng báo cho em biết nếu chị thấy khó chịu nhé."
+            }
+          ]
+        },
+        "input": "It's a bit sore, but I can handle it.",
+        "input_vi": "Hơi đau một chút, nhưng tôi chịu được."
+      }
+    },
+    {
+      "step": 3,
+      "purpose": "Trấn an khách hàng",
+      "dialogue": {
+        "output": {
+          "primary": "Don't worry, I'll be very gentle. I'll use a smaller drill bit.",
+          "primary_vi": "Đừng lo lắng ạ, em sẽ làm rất nhẹ nhàng. Em sẽ dùng đầu mài nhỏ hơn.",
+          "alternatives": [
+            {
+              "text": "I'm almost done. I'll make sure there is no bleeding.",
+              "vi": "Em sắp xong rồi ạ. Em sẽ đảm bảo không bị chảy máu."
+            },
+            {
+              "text": "I'll apply some antiseptic to make sure it's safe.",
+              "vi": "Em sẽ bôi chút thuốc sát trùng để đảm bảo an toàn ạ."
+            }
+          ]
+        },
+        "input": "Okay, thank you. I feel much safer now.",
+        "input_vi": "Được rồi, cảm ơn em. Giờ tôi thấy an tâm hơn rồi."
+      }
     }
   ],
-  "roleplay": {
-    "ai_instructions": "You are Ms. Minh. You have a painful ingrown nail. You are nervous about the nippers.",
-    "user_instructions": "Bạn là thợ Hân. Hãy trấn an khách và bắt đầu vệ sinh móng chuyên nghiệp."
+  "vocabulary": [
+    {"word": "Cuticle nippers", "vi": "Kiềm cắt da", "category": "specialized"},
+    {"word": "Nail drill", "vi": "Máy mài móng", "category": "specialized"},
+    {"word": "Ingrown nail", "vi": "Móng khóe", "category": "specialized"},
+    {"word": "Sterilized", "vi": "Đã tiệt trùng", "category": "specialized"},
+    {"word": "Sore", "vi": "Đau nhức/Ê", "category": "general"}
+  ],
+  "grammar": {
+    "structures": ["Imperative sentences", "Sensation check questions"],
+    "collocations": ["Soak your feet", "Safety first"]
   }
 }
