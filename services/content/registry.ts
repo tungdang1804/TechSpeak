@@ -2,172 +2,18 @@
 import { Lesson } from '../../types';
 
 /**
- * Registry chứa toàn bộ nội dung bài học.
- * Việc để dữ liệu ở đây giúp App chạy offline tốt và tránh lỗi 404.
+ * Lazy Lesson Loaders
+ * Quy ước đặt tên Key và File: [industryId]_les[number]
+ * Việc dùng tên file tường minh giúp hệ thống deploy phân giải đường dẫn chính xác.
  */
-export const LESSON_DATA: Record<string, Lesson> = {
-  "nails_les1": {
-    "id": "nails_les1",
-    "order": 1,
-    "title": "Proactive Booking",
-    "description": "Chủ động dẫn dắt cuộc gọi đặt lịch: Dịch vụ, Thời gian, Số lượng.",
-    "thumbnail": "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?q=80&w=400&auto=format&fit=crop",
-    "context": {
-      "background": "Tình huống diễn ra qua điện thoại khi khách hàng gọi đến tiệm để hỏi lịch hẹn.",
-      "goal": "Nhân viên chủ động chốt: Dịch vụ, thời gian và số lượng người.",
-      "characters": [
-        { "name": "Tiên", "role": "Nhân viên điều phối." },
-        { "name": "Ms. Minh", "role": "Khách hàng." }
-      ]
-    },
-    "steps": [
-      {
-        "id": "l1_step1",
-        "title": "Bước 1: Lời chào và Nhu cầu",
-        "purpose": "Khẳng định sự chuyên nghiệp",
-        "lines": [
-          {
-            "id": "l1_s1_tech",
-            "speaker": "Tech",
-            "text": "Hello, Star Spa speaking. How can I help you today?",
-            "translation": "Xin chào, Star Spa xin nghe. Tôi có thể giúp gì cho bạn?"
-          },
-          {
-            "id": "l1_s1_cust",
-            "speaker": "Customer",
-            "text": "Hi, I want to book an appointment for tomorrow.",
-            "translation": "Chào bạn, tôi muốn đặt lịch cho ngày mai."
-          }
-        ]
-      },
-      {
-        "id": "l1_step2",
-        "title": "Bước 2: Xác định dịch vụ & Số người",
-        "purpose": "Thu thập thông tin để chuẩn bị thợ",
-        "lines": [
-          {
-            "id": "l1_s2_tech",
-            "speaker": "Tech",
-            "text": "And how many people are you? What service do you want?",
-            "translation": "Nhóm mình đi mấy người ạ? Và bạn muốn làm dịch vụ gì?"
-          },
-          {
-            "id": "l1_s2_cust",
-            "speaker": "Customer",
-            "text": "I want a full set and a pedicure.",
-            "translation": "Tôi muốn làm một bộ đầy đủ và làm móng chân."
-          }
-        ]
-      },
-      {
-        "id": "l1_step3",
-        "title": "Bước 3: Chốt thời gian & Tên khách",
-        "purpose": "Tìm khung giờ trống phù hợp",
-        "lines": [
-          {
-            "id": "l1_s3_tech",
-            "speaker": "Tech",
-            "text": "What time can you come? Is 2:30 available for you?",
-            "translation": "Bạn có thể ghé lúc mấy giờ? 2:30 có tiện cho bạn không?"
-          },
-          {
-            "id": "l1_s3_cust",
-            "speaker": "Customer",
-            "text": "My name is Minh. 2:30 is perfect.",
-            "translation": "Tên tôi là Minh. 2:30 là khung giờ tuyệt vời."
-          }
-        ]
-      },
-      {
-        "id": "l1_step4",
-        "title": "Bước 4: Xác nhận lại lịch",
-        "purpose": "Kiểm tra chéo thông tin cuối cùng",
-        "lines": [
-          {
-            "id": "l1_s4_tech",
-            "speaker": "Tech",
-            "text": "Thank you for booking. Ms. Minh, one full set and a pedicure at 2:30 tomorrow. See you then!",
-            "translation": "Cám ơn bạn đã đặt lịch. Chị Minh, một bộ đầy đủ và móng chân vào 2:30 ngày mai. Hẹn gặp lại chị nhé!"
-          }
-        ]
-      }
-    ],
-    "vocabularies": [
-      { "id": "v1", "word": "Speaking", "translation": "Đang nghe máy", "ipa": "/ˈspiːkɪŋ/" },
-      { "id": "v2", "word": "Appointment", "translation": "Lịch hẹn", "ipa": "/əˈpɔɪntmənt/" },
-      { "id": "v3", "word": "Available", "translation": "Còn trống", "ipa": "/əˈveɪləbl/" },
-      { "id": "v4", "word": "Slot", "translation": "Khung giờ", "ipa": "/slɒt/" },
-      { "id": "v5", "word": "Confirmation", "translation": "Xác nhận", "ipa": "/ˌkɒnfəˈmeɪʃn/" }
-    ],
-    "grammar_points": [
-      {
-        "id": "g1",
-        "title": "WH-Questions (Hỏi nhu cầu)",
-        "description": "Cấu trúc dùng để lấy thông tin cụ thể.",
-        "examples": [{ "english": "What time would you like?", "vietnamese": "Bạn muốn mấy giờ?" }]
-      },
-      {
-        "id": "g2",
-        "title": "Choice Questions (Câu hỏi lựa chọn)",
-        "description": "Dùng cấu trúc A or B? để đưa gợi ý.",
-        "examples": [{ "english": "Is it for one person or two?", "vietnamese": "Lịch này cho một hay hai người ạ?" }]
-      }
-    ],
-    "roleplay": {
-      "user_instructions": "Bạn là nhân viên Tiên. Hãy chào khách và chốt lịch hẹn cho ngày mai.",
-      "ai_instructions": "You are Ms. Minh calling Star Spa. You want a full set tomorrow at 2:30."
-    }
-  },
-  "nails_les2": {
-    "id": "nails_les2",
-    "order": 2,
-    "title": "Welcome & Consultation",
-    "description": "Đón khách và tư vấn mẫu thiết kế (Cat-eye, 3D).",
-    "thumbnail": "https://images.unsplash.com/photo-1604902396830-aca29e19b067?q=80&w=400&auto=format&fit=crop",
-    "context": {
-      "background": "Khách hàng Ms. Minh trực tiếp ghé tiệm theo lịch hẹn.",
-      "goal": "Chào đón khách và thực hiện tư vấn thiết kế phù hợp sự kiện.",
-      "characters": [
-        { "name": "Tiên", "role": "Nhân viên tư vấn." },
-        { "name": "Ms. Minh", "role": "Khách hàng dự sự kiện." }
-      ]
-    },
-    "steps": [
-      {
-        "id": "l2_step1",
-        "title": "Bước 1: Chào đón & Kiểm tra lịch",
-        "purpose": "Xác nhận lịch hẹn chuyên nghiệp",
-        "lines": [
-          {
-            "id": "l2_s1_cust",
-            "speaker": "Customer",
-            "text": "Hi, my name is Minh. I booked an appointment for 2:30.",
-            "translation": "Chào bạn, tôi là Minh. Tôi đã có lịch lúc 2:30."
-          },
-          {
-            "id": "l2_s1_tech",
-            "speaker": "Tech",
-            "text": "Welcome to Star Spa, Ms. Minh. Your station is ready.",
-            "translation": "Chào mừng chị Minh. Chỗ ngồi của chị đã sẵn sàng."
-          }
-        ]
-      }
-    ],
-    "vocabularies": [
-      { "id": "v1", "word": "Station", "translation": "Vị trí làm việc", "ipa": "/ˈsteɪʃn/" },
-      { "id": "v2", "word": "Elegant", "translation": "Sang trọng", "ipa": "/ˈelɪɡənt/" }
-    ],
-    "grammar_points": [
-      {
-        "id": "g1",
-        "title": "Polite Request",
-        "description": "Dùng 'Would you like to' để mời khách.",
-        "examples": [{ "english": "Would you like to take a look?", "vietnamese": "Chị có muốn xem qua không?" }]
-      }
-    ],
-    "roleplay": {
-      "user_instructions": "Bạn là Tiên. Hãy đón chị Minh và tư vấn mẫu móng sang trọng.",
-      "ai_instructions": "You are Ms. Minh. You want something elegant for a wedding."
-    }
-  }
+export const LESSON_LOADERS: Record<string, () => Promise<{ lesson: Lesson }>> = {
+  "nails_les1": () => import('./lessons/nails/nails_les1'),
+  "nails_les2": () => import('./lessons/nails/nails_les2'),
+  "nails_les3": () => import('./lessons/nails/nails_les3'),
+  "nails_les4": () => import('./lessons/nails/nails_les4'),
+  "nails_les5": () => import('./lessons/nails/nails_les5'),
+  "nails_les6": () => import('./lessons/nails/nails_les6'),
+  "nails_les7": () => import('./lessons/nails/nails_les7'),
+  "nails_les8": () => import('./lessons/nails/nails_les8'),
+  "bartender_les1": () => import('./lessons/bartender/bartender_les1'),
 };
