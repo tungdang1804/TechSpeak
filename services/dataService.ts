@@ -1,9 +1,10 @@
 
 import { Lesson } from '../types';
 import { getIndustryInfo } from './content/industry';
+import { LESSON_DATA } from './content/registry';
 
 /**
- * Hardcoded Manifest để đảm bảo tính ổn định cao nhất (Zero-latency)
+ * Hardcoded Manifest để quản lý danh sách bài học
  */
 const LESSONS_MANIFEST = {
   "industries": [
@@ -11,20 +12,20 @@ const LESSONS_MANIFEST = {
       "id": "nails",
       "name": "Nail & Spa",
       "lessons": [
-        "lessons/nails/nails_les1.json",
-        "lessons/nails/nails_les2.json",
-        "lessons/nails/nails_les3.json",
-        "lessons/nails/nails_les4.json",
-        "lessons/nails/nails_les5.json",
-        "lessons/nails/nails_les6.json",
-        "lessons/nails/nails_les7.json",
-        "lessons/nails/nails_les8.json"
+        "nails_les1",
+        "nails_les2",
+        "nails_les3",
+        "nails_les4",
+        "nails_les5",
+        "nails_les6",
+        "nails_les7",
+        "nails_les8"
       ]
     },
     {
       "id": "bartender",
       "name": "Bartender",
-      "lessons": ["lessons/bartender/bartender_les1.json"]
+      "lessons": ["bartender_les1"]
     }
   ]
 };
@@ -36,23 +37,14 @@ export const fetchLessonsByIndustry = async (industryId: string = 'nails'): Prom
 
     const industryData = LESSONS_MANIFEST.industries.find((i: any) => i.id === industryId);
     
-    if (!industryData || !industryData.lessons || industryData.lessons.length === 0) {
+    if (!industryData || !industryData.lessons) {
       return [];
     }
 
-    const lessonPromises = industryData.lessons.map(async (path: string) => {
-      // Đảm bảo đường dẫn chuẩn xác cho môi trường browser
-      const cleanPath = path.startsWith('./') ? path : `./${path}`;
-      try {
-        const response = await fetch(cleanPath);
-        if (!response.ok) return null;
-        return await response.json();
-      } catch (err) {
-        return null;
-      }
+    // Lấy dữ liệu trực tiếp từ Registry thay vì fetch qua mạng
+    const results = industryData.lessons.map(lessonId => {
+      return LESSON_DATA[lessonId] || null;
     });
-
-    const results = await Promise.all(lessonPromises);
     
     return results
       .filter((l): l is Lesson => l !== null)
